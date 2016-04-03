@@ -10,7 +10,7 @@ var path = require('path'),
 
 class Geth {
   constructor(options) {
-    options = options || {}:
+    options = options || {};
 
     // options for geth
     this._gethOptions = Object.assign({
@@ -18,7 +18,6 @@ class Geth {
       rpccorsdomain: "*",
       rpc: null,
       rpcapi: "admin,db,eth,debug,miner,net,shh,txpool,personal,web3",
-      mine: null,
       maxpeers: 0,
       nodiscover: null,
     }, options.gethOptions);
@@ -39,16 +38,12 @@ class Geth {
   }
 
   start() {
-    return this._createDataDir()
-      .then(() => {
-        return this._createGenesisFile();
-      })
-      .then(() => {
-        return this._loadAccountInfo();
-      })
-      .then(() => {
-        return this._startGeth();
-      });
+    return Q.try(() => {
+      this._createDataDir();
+      this._createGenesisFile();
+      this._loadAccountInfo();
+      this._startGeth();
+    });
   }
 
 
@@ -80,11 +75,11 @@ class Geth {
 
 
   _createDataDir () {
-    let options = this._
+    let options = this._gethOptions;
 
     // need to create temporary data dir?
     if (!options.datadir) {
-      options.datadir = this._tmpDataDir = tmp.dirSync();
+      options.datadir = this._tmpDataDir = tmp.dirSync().name;
     }
     // else let's check the given one
     else {
@@ -97,7 +92,7 @@ class Geth {
 
 
   _createGenesisFile () {
-    this._genesisFilePath = path.join(this._datadir, 'genesis.json');
+    this._genesisFilePath = path.join(this._gethOptions.datadir, 'genesis.json');
 
     if (!shell.test('-e', this._genesisFilePath)) {
       // create genesis file
@@ -106,9 +101,9 @@ class Geth {
       
       // start geth and create an account
       this._exec(
-        _buildGethCommandLine(
-          ['js', path.join(__dirname, 'data', 'setup.js')
-        ])
+        this._buildGethCommandLine(
+          ['js', path.join(__dirname, 'data', 'setup.js')]
+        )
       );
 
       // load account info
@@ -128,9 +123,9 @@ class Geth {
   _loadAccountInfo () {
     // fetch account info from geth
     let str = this._exec(
-      _buildGethCommandLine(
-        ['account', 'list')
-      ])
+      this._buildGethCommandLine(
+        ['account', 'list']
+      )
     ).stdout;
 
     // parse and get account id
@@ -159,7 +154,7 @@ class Geth {
 
 
   _startGeth() {
-    let gethcli = _buildGethCommandLine();
+    let gethcli = this._buildGethCommandLine();
 
     this._proc = this._exec(getcli, {
       async: true,
@@ -183,7 +178,7 @@ class Geth {
       if (null !== val) {
 
       }
-      if (val instanceof string) {
+      if (typeof val === "string") {
         str.push(`"${val}"`);
       } else {
         str.push(val);
@@ -193,7 +188,7 @@ class Geth {
     // genesis file
     str.push('--genesis', this._genesisFilePath);
 
-    return `${this._geth} ${str} ${command ? command.join(' ') : ''}`;
+    return `${this._geth} ${str.join(' ')} ${command ? command.join(' ') : ''}`;
   }
 
 
