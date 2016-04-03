@@ -1,0 +1,41 @@
+{
+  "name": "geth-private",
+  "version": "0.1.0",
+  "description": "Quickly setup a local, private Ethereum blockchain.",
+  "main": "index.js",
+  "bin": "bin/geth-private",
+  "author": {
+    "name": "Ramesh Nair",
+    "email": "ram@hiddentao.com"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "bluebird": "^3.3.4",
+    "shelljs": "^0.6.0",
+    "tmp": "0.0.28",
+    "which": "^1.2.4"
+  },
+  "engines": {
+    "node": ">=4.0.0"
+  },
+  "engine-strict": true,
+  "readmeFilename": "README.md",
+  "bugs": {
+    "url": "https://github.com/hiddentao/geth-private/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/hiddentao/geth-private.git"
+  },
+  "keywords": [
+    "ethereum",
+    "bitcoin",
+    "blockchain",
+    "crypto",
+    "currency",
+    "cryptocurrency",
+    "private",
+    "local",
+    "testing"
+  ]
+}
