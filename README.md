@@ -32,7 +32,7 @@ $ geth-private
 You should see something like:
 
 ```bash
-eth is now running (pid: 2428).
+geth is now running (pid: 2428).
 
 Etherbase:  8864324ac84c3b6c507591dfabeffdc1ad02e09b
 Data folder:  /var/folders/4v/br6x6mlx113235v1lz39nwfc0000gn/T/tmp-242211yXIVsOX5tP
@@ -40,8 +40,13 @@ Data folder:  /var/folders/4v/br6x6mlx113235v1lz39nwfc0000gn/T/tmp-242211yXIVsOX
 To attach:  geth attach ipc:///var/folders/4v/br6x6mlx113235v1lz39nwfc0000gn/T/tmp-242211yXIVsOX5tP/
 ```
 
-Run the `geth attach` command given attach a console to this running geth 
-instance. Or you can access it via [web3](https://github.com/ethereum/web3.js) RPC.
+Run the `attach` command given to attach a console to this running geth 
+instance. By default [web3](https://github.com/ethereum/web3.js) RPC is also 
+enabled.
+
+One it's running launch Ethereum/Mist wallet as normal - it should be able to 
+connect to your geth instance. 
+
 
 **Options**
 
@@ -60,6 +65,13 @@ For example, you can customize network identity, port, etc:
 
 ```bash
 $ geth-private --port 10023 --networkid 54234 --identity testnetwork
+```
+
+By default geth-private stores its keystore and blockchain data inside a 
+temporarily generated folder. You can override this using the `datadir` option:
+
+```bash
+$ geth-private --datadir /path/to/data/folder
 ```
 
 
@@ -88,6 +100,8 @@ inst.start()
 Same as for the CLI, you can customize it by passing options to the construction:
 
 ```js
+var geth = require('geth-private');
+
 var inst = geth({
   gethPath: '/path/to/geth',
   verbose: true,
@@ -103,6 +117,8 @@ var inst = geth({
     */
   }
 });
+
+inst.start().then(...);
 ```
 
 
