@@ -136,6 +136,14 @@ var inst = geth({
 inst.start().then(...);
 ```
 
+## Development
+
+To run the tests:
+
+```bash
+$ npm install
+$ npm test
+```
 
 ## Contributions
 
