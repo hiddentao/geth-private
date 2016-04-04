@@ -1,6 +1,6 @@
 # geth-private
 
-Quickly setup a local, private Ethereum blockchain. 
+Quickly setup a local, private Ethereum blockchain.
 
 Features:
 
@@ -39,6 +39,8 @@ Data folder:  /var/folders/4v/br6x6mlx113235v1lz39nwfc0000gn/T/tmp-242211yXIVsOX
 
 To attach:  geth attach ipc:///var/folders/4v/br6x6mlx113235v1lz39nwfc0000gn/T/tmp-242211yXIVsOX5tP/
 ```
+
+Default account balance is 5,000,000 ether - plenty to play around with :)
 
 Run the `attach` command given to attach a console to this running geth 
 instance. By default [web3](https://github.com/ethereum/web3.js) RPC is also 
