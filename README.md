@@ -72,11 +72,17 @@ $ geth-private --port 10023 --networkid 54234 --identity testnetwork
 ```
 
 By default geth-private stores its keystore and blockchain data inside a 
-temporarily generated folder. You can override this using the `datadir` option:
+temporarily generated folder, which gets automatically deleted once it exits. 
+You can override this behaviour by providing a custom location using the 
+`datadir` option:
 
 ```bash
 $ geth-private --datadir /path/to/data/folder
 ```
+
+When geth-private exits it won't auto-delete this data folder since you 
+manually specified its. This allows you to re-use once created keys and 
+accounts easily.
 
 
 ### via API

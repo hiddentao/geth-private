@@ -73,6 +73,12 @@ class Geth {
 
           this._proc = null;
 
+          if (this._tmpDataDir) {
+            this._log(`Destroying data...`);
+
+            shell.rm('-rf', this._gethOptions.datadir);
+          }
+
           resolve();
         });
 
@@ -81,17 +87,6 @@ class Geth {
         this._proc.kill();  // kill the child
       });
     });
-  }
-
-
-  destroyData () {
-    if (this._proc) {
-      throw new Error("Cannot destroy while still running");
-    }
-
-    this._log(`Destroying data...`);
-
-    shell.rm('-rf', this._gethOptions.datadir);
   }
 
 

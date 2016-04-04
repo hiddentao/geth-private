@@ -150,27 +150,12 @@ test['cleanup'] = {
       })
       .asCallback(done);
   },
-  'leaves data folder intact': function(done) {
+  'auto-deetes data folder': function(done) {
     this.inst.stop()
       .then(() => {
-        shell.test('-e', path.join(this.inst.dataDir, 'genesis.json')).should.be.true;
+        shell.test('-e', path.join(this.inst.dataDir, 'genesis.json')).should.be.false;
       })
       .asCallback(done);
-  },
-  'can destroy data': {
-    'without problem': function(done) {
-      this.inst.stop()
-        .then(() => {
-          this.inst.destroyData();
-          shell.test('-e', path.join(this.inst.dataDir)).should.be.false;
-        })
-        .asCallback(done);
-    },
-    'but not when running': function() {
-      expect(() => {
-        this.inst.destroyData();
-      }).to.throw('Cannot destroy while still running');
-    },
   },
 },
 
@@ -238,6 +223,8 @@ test['custom data dir'] = {
         return this.inst.stop();
       })
       .then(() => {
+        shell.test('-e', this.datadir).should.be.true;
+
         return this.inst.start();
       })
       .then(() => {
