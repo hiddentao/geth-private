@@ -1,7 +1,5 @@
 # geth-private
 
-[![Build Status](https://secure.travis-ci.org/hiddentao/geth-private.png)](http://travis-ci.org/hiddentao/geth-private)
-
 Quickly setup a local, private Ethereum blockchain.
 
 Features:
