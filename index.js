@@ -61,14 +61,18 @@ class Geth {
   }
 
 
-  stop() {
+  stop(options) {
+    options = Object.assign({
+      kill: false
+    }, options);
+
     return Q.try(() => {
       if (!this._proc) {
         throw new Error("Not started");
       }
 
       return new Q((resolve, reject) => {
-        this._proc.on('close', () => {
+        this._proc.on('close', (code, signal) => {
           this._log(`Stopped.`);
 
           this._proc = null;
@@ -79,12 +83,15 @@ class Geth {
             shell.rm('-rf', this._gethOptions.datadir);
           }
 
-          resolve();
+          resolve({
+            code: code,
+            signal: signal,
+          });
         });
 
         this._log(`Stopping...`);
 
-        this._proc.kill();  // kill the child
+        this._proc.kill(options.kill ? 'SIGKILL' : 'SIGTERM');
       });
     });
   }

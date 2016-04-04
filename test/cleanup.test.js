@@ -23,6 +23,9 @@ module.exports = {
     this.inst = source();
 
     this.inst.start()
+      .then(() => {
+        testUtils.canAttach(this.inst.dataDir).should.be.true;
+      })
       .asCallback(done);
   },
   afterEach: function(done) {
@@ -34,11 +37,22 @@ module.exports = {
       })
       .asCallback(done);
   },
-  'can stop geth': function(done) {
-    testUtils.canAttach(this.inst.dataDir).should.be.true;
-    
+  'can stop geth': function(done) {    
     this.inst.stop()
-      .then(() => {
+      .then((ret) => {
+        expect(ret.signal).to.eql('SIGTERM');
+
+        testUtils.canAttach(this.inst.dataDir).should.be.false;
+      })
+      .asCallback(done);
+  },
+  'can stop using kill': function(done) {
+    this.inst.stop({
+      kill: true
+    })
+      .then((ret) => {
+        expect(ret.signal).to.eql('SIGKILL');
+
         testUtils.canAttach(this.inst.dataDir).should.be.false;
       })
       .asCallback(done);
