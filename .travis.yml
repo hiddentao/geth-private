@@ -1,3 +1,6 @@
+sudo: required
+dist: trusty
+
 language: node_js
 
 node_js:
@@ -19,3 +22,5 @@ script:
 notifications:
   email:
     - ram@hiddentao.com
+
+    
