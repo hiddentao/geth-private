@@ -22,7 +22,9 @@ module.exports = {
   beforeEach: function(done) {
     this.inst = source();
 
-    this.inst.start().asCallback(done);
+    this.inst.start()
+      .delay(2000)
+      .asCallback(done);
   },
   afterEach: function(done) {
     Q.resolve()
@@ -31,6 +33,7 @@ module.exports = {
           return this.inst.stop();
         }
       })
+      .delay(2000)
       .asCallback(done);
   },
   'can stop geth': function(done) {

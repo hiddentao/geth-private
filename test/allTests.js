@@ -5,7 +5,7 @@ var test = module.exports = {};
   'cleanup', 
   'gethOptions', 
   'gethPath', 
-  // 'customDataDir',
+  'customDataDir',
 ].forEach(function(name) {
   test[name] = require(`./${name}.test`);
 });

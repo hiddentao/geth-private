@@ -14,7 +14,6 @@ before_install:
   - mkdir -p ~/.ethereum
 
 before_script:
-  - "npm install -g gulp"
   - "npm install"
 
 script:
