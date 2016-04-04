@@ -23,7 +23,6 @@ module.exports = {
     this.inst = source();
 
     this.inst.start()
-      .delay(2000)
       .asCallback(done);
   },
   afterEach: function(done) {
@@ -33,7 +32,6 @@ module.exports = {
           return this.inst.stop();
         }
       })
-      .delay(2000)
       .asCallback(done);
   },
   'can stop geth': function(done) {

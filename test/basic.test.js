@@ -36,7 +36,6 @@ module.exports = {
   'once started': {
     before: function(done) {
       this.inst.start()
-        .delay(2000)
         .asCallback(done);
     },
     after: function(done) {
@@ -45,7 +44,6 @@ module.exports = {
           return this.inst.stop();
         }
       })
-      .delay(2000)
       .asCallback(done);
     },
     'is running': function() {

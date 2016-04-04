@@ -27,7 +27,6 @@ module.exports = {
           return this.inst.stop();
         }
       })
-      .delay(2000)
       .asCallback(done);
   },
   'override': function(done) {
@@ -40,7 +39,6 @@ module.exports = {
     });
 
     this.inst.start()
-      .delay(2000)
       .then(() => {
         let out = testUtils.gethExecJs(this.inst.dataDir, `admin.nodeInfo`);
         out.should.contain('Geth/testnode123');

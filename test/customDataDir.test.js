@@ -47,7 +47,6 @@ module.exports = {
   },
   'will create it if it doesn\'t exist': function(done) {
     this.inst.start()
-      .delay(2000)
       .then(() => {
         shell.test('-e', this.datadir).should.be.true;
       })
@@ -57,7 +56,6 @@ module.exports = {
     let account = null;
 
     this.inst.start()
-      .delay(2000)
       .then(() => {
         account = this.inst.account;
 

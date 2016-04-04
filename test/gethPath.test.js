@@ -26,7 +26,6 @@ module.exports = {
     });
 
     this.inst.start()
-      .delay(2000)
       .then(() => {
         throw new Error('Should not be here');
       })

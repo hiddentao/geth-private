@@ -13,7 +13,9 @@ _Thanks to [Ade Duke](http://adeduke.com/2015/08/how-to-create-a-private-ethereu
 
 ## Installation
 
-For both command-line and programmatic usage:
+**Node.js v4+ is required**. You can install it using [nvm](https://github.com/creationix/nvm).
+
+I recommend installing geth-private as a global module so that the CLI becomes available in your PATH:
 
 ```bash
 $ npm install -g geth-private
