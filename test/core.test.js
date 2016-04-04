@@ -98,6 +98,7 @@ test['geth options'] = {
   'override': function(done) {
     this.inst = source({
       gethOptions: {
+        rpc: false,
         identity: 'testnode123',
         port: 44323,
       }
@@ -108,6 +109,11 @@ test['geth options'] = {
         let out = testUtils.gethExecJs(this.inst.dataDir, `admin.nodeInfo`);
         out.should.contain('Geth/testnode123');
         out.should.contain('listener: 44323');
+      })
+      .then(() => {
+        var web3 = new Web3();
+        web3.setProvider(new web3.providers.HttpProvider('http://localhost:8545'));
+        web3.eth.coinbase.should.eql('');
       })
       .asCallback(done);
   }
