@@ -68,7 +68,7 @@ class Geth {
       }
 
       return new Q((resolve, reject) => {
-        this._proc.on('exit', () => {
+        this._proc.on('close', () => {
           this._log(`Stopped.`);
 
           this._proc = null;

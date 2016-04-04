@@ -39,7 +39,6 @@ module.exports = {
           return this.inst.stop();
         }
       })
-      .delay(2000)
       .then(() => {
         shell.rm('-rf', this.datadir);
       })
