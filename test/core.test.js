@@ -174,7 +174,6 @@ test['bad geth path'] = function(done) {
       err += '';
 
       err.should.contain('Execution failed');
-      err.should.contain('No such file or directory');
     })
     .asCallback(done);
 };
