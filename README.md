@@ -11,11 +11,15 @@ Features:
 
 _Thanks to [Ade Duke](http://adeduke.com/2015/08/how-to-create-a-private-ethereum-chain/) for original how-to._
 
+## Requirements:
+
+* Node.js v4 or above (you can install it using [nvm](https://github.com/creationix/nvm))
+* [Geth](https://github.com/ethereum/go-ethereum)
+
 ## Installation
 
-**Node.js v4+ is required**. You can install it using [nvm](https://github.com/creationix/nvm).
-
-I recommend installing geth-private as a global module so that the CLI becomes available in your PATH:
+I recommend installing geth-private as a global module so that the CLI becomes 
+available in your PATH:
 
 ```bash
 $ npm install -g geth-private
