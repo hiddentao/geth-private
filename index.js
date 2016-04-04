@@ -16,10 +16,10 @@ class Geth {
     this._gethOptions = Object.assign({
       networkid: "33333",
       rpccorsdomain: "*",
-      rpc: null,
+      rpc: true,
       rpcapi: "admin,db,eth,debug,miner,net,shh,txpool,personal,web3",
       maxpeers: 0,
-      nodiscover: null,
+      nodiscover: true,
     }, options.gethOptions);
 
     // path to geth
@@ -214,17 +214,16 @@ class Geth {
 
     let str = [];
     for (let key in gethOptions) {
-      str.push(`--${key}`);
-
       let val = gethOptions[key];
 
-      if (null !== val) {
+      if (null !== val && false !== val) {
+        str.push(`--${key}`);
 
-      }
-      if (typeof val === "string") {
-        str.push(`"${val}"`);
-      } else {
-        str.push(val);
+        if (typeof val === "string") {
+          str.push(`"${val}"`);
+        } else if (typeof val !== "boolean") {
+          str.push(`${val}`);
+        }        
       }
     }
 

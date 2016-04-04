@@ -16,7 +16,7 @@ exports.canAttach = function(dataDir) {
 };
 
 
-exports.web3exec = function(dataDir, jsToExecute) {
+exports.gethExecJs = function(dataDir, jsToExecute) {
   let ret = shell.exec(`${GETH} --exec '${jsToExecute}' attach ipc://${dataDir}/geth.ipc`, {
     silent: true,
     async: false,
@@ -28,6 +28,9 @@ exports.web3exec = function(dataDir, jsToExecute) {
 
   return ret.stdout;
 };
+
+
+
 
 
 

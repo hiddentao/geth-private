@@ -5,7 +5,8 @@ var Q = require('bluebird'),
   chai = require('chai'),
   tmp = require('tmp'),
   path = require('path'),
-  shell = require('shelljs');
+  shell = require('shelljs'),
+  Web3 = require('web3');
 
 var expect = chai.expect,
   should = chai.should();
@@ -60,17 +61,56 @@ test['default'] = {
     },
     'attach console': {
       'check coinbase': function() {
-        let out = testUtils.web3exec(this.inst.dataDir, `eth.coinbase`);
+        let out = testUtils.gethExecJs(this.inst.dataDir, `eth.coinbase`);
 
         out.trim().should.eql(`\"0x${this.inst.account}\"`);
       },    
       'check balance': function() {
-        let out = testUtils.web3exec(this.inst.dataDir, `web3.fromWei(eth.getBalance(eth.coinbase),"ether")`);
+        let out = testUtils.gethExecJs(this.inst.dataDir, `web3.fromWei(eth.getBalance(eth.coinbase),"ether")`);
 
         out.trim().should.eql('5000000');  // 5million, awwww yeah ;)
       },  
     },
+    'rpc': {
+      before: function() {
+        this.web3 = new Web3();
+        this.web3.setProvider(new this.web3.providers.HttpProvider('http://localhost:8545'));
+      },
+      'get coinbase': function() {
+        this.web3.eth.coinbase.should.eql(`0x${this.inst.account}`);
+      },
+    }
   },
+};
+
+
+
+test['geth options'] = {
+  afterEach: function(done) {
+    Q.resolve()
+      .then(() => {
+        if (this.inst && this.inst.isRunning) {
+          return this.inst.stop();
+        }
+      })
+      .asCallback(done);
+  },
+  'override': function(done) {
+    this.inst = source({
+      gethOptions: {
+        identity: 'testnode123',
+        port: 44323,
+      }
+    });
+
+    this.inst.start()
+      .then(() => {
+        let out = testUtils.gethExecJs(this.inst.dataDir, `admin.nodeInfo`);
+        out.should.contain('Geth/testnode123');
+        out.should.contain('listener: 44323');
+      })
+      .asCallback(done);
+  }
 };
 
 
@@ -193,7 +233,7 @@ test['custom data dir'] = {
       .then(() => {
         this.inst.account.should.eql(account);
 
-        let out = testUtils.web3exec(this.inst.dataDir, `web3.fromWei(eth.getBalance(eth.coinbase),"ether")`);
+        let out = testUtils.gethExecJs(this.inst.dataDir, `web3.fromWei(eth.getBalance(eth.coinbase),"ether")`);
 
         out.trim().should.eql('5000000');  // 5million, awwww yeah ;)        
       })
