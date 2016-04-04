@@ -62,14 +62,14 @@ class Geth {
 
 
   stop(options) {
-    options = Object.assign({
-      kill: false
-    }, options);
-
     return Q.try(() => {
       if (!this._proc) {
         throw new Error("Not started");
       }
+
+      options = Object.assign({
+        kill: false
+      }, options);
 
       return new Q((resolve, reject) => {
         this._proc.on('close', (code, signal) => {
