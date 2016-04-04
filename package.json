@@ -4,6 +4,9 @@
   "description": "Quickly setup a local, private Ethereum blockchain.",
   "main": "index.js",
   "bin": "bin/geth-private",
+  "scripts": {
+    "test": "gulp test"
+  },
   "author": {
     "name": "Ramesh Nair",
     "email": "ram@hiddentao.com"
@@ -37,5 +40,10 @@
     "private",
     "local",
     "testing"
-  ]
+  ],
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "gulp": "^3.9.1",
+    "gulp-mocha": "^2.2.0"
+  }
 }

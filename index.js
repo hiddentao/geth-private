@@ -38,12 +38,22 @@ class Geth {
   }
 
   start() {
+    if (this.isRunning) {
+      throw new Error('Already running');
+    }
+
+    this._log(`Starting...`);
+
     return Q.try(() => {
       this._createDataDir();
       this._createGenesisFile();
-      this._loadAccountInfo();
       this._startGeth();
     });
+  }
+
+
+  get isRunning () {
+    return !!this._proc;
   }
 
 
@@ -54,9 +64,15 @@ class Geth {
       }
 
       return new Q((resolve, reject) => {
-        this._proc.on('exit', function() {
+        this._proc.on('exit', () => {
+          this._log(`Stopped.`);
+
+          this._proc = null;
+
           resolve();
         });
+
+        this._log(`Stopping...`);
 
         this._proc.kill();  // kill the child
       });
@@ -64,15 +80,24 @@ class Geth {
   }
 
 
-  destroy () {
+  destroyData () {
+    if (this._proc) {
+      throw new Error("Cannot destroy while still running");
+    }
+
+    this._log(`Destroying data...`);
+
     shell.rm('-rf', this._gethOptions.datadir);
   }
 
 
-  account () {
+  get account () {
     return this._account;
   }
 
+  get dataDir () {
+    return this._gethOptions.datadir;
+  }
 
   _createDataDir () {
     let options = this._gethOptions;
@@ -80,11 +105,15 @@ class Geth {
     // need to create temporary data dir?
     if (!options.datadir) {
       options.datadir = this._tmpDataDir = tmp.dirSync().name;
+
+      this._log(`Created temporary data dir: ${options.datadir}`);
     }
     // else let's check the given one
     else {
       // if not found then try to create it
       if (!shell.test('-e', options.datadir)) {
+        this._log(`Creating data dir: ${options.datadir}`);
+
         shell.mkdir('-p', options.datadir);
       }        
     }        
@@ -94,12 +123,17 @@ class Geth {
   _createGenesisFile () {
     this._genesisFilePath = path.join(this._gethOptions.datadir, 'genesis.json');
 
+    this._log(`Genesis file: ${this._genesisFilePath}`);
+
     if (!shell.test('-e', this._genesisFilePath)) {
+      this._log(`Creating genesis file...`);
+
       // create genesis file
       let genesisStr = this._buildGenesisString();
       fs.writeFileSync(this._genesisFilePath, genesisStr);
       
       // start geth and create an account
+      this._log(`Creating account...`);
       this._exec(
         this._buildGethCommandLine(
           ['js', path.join(__dirname, 'data', 'setup.js')]
@@ -110,17 +144,22 @@ class Geth {
       this._loadAccountInfo();
 
       // overwrite new genesis file with account and preset balance
+      this._log(`Re-writing genesis file with presets...`);
       let alloc = {};
       alloc[this._account] = {
         "balance": "5000000000000000000000000"
       };
       let newGenesisStr = this._buildGenesisString({ alloc: alloc });
-      fs.writeFileSync(this._genesisFilePath, genesisStr);
+      fs.writeFileSync(this._genesisFilePath, newGenesisStr);
+    } else {
+      this._loadAccountInfo();
     }
   }
 
 
   _loadAccountInfo () {
+    this._log(`Loading account info...`);
+
     // fetch account info from geth
     let str = this._exec(
       this._buildGethCommandLine(
@@ -134,7 +173,9 @@ class Geth {
       throw new Error('Unable to fetch account info');
     }
 
-    this._account = accountMatch[0];
+    this._account = accountMatch[1];
+
+    this._log(`Account: ${this._account}`);
   }
 
 
@@ -154,14 +195,16 @@ class Geth {
 
 
   _startGeth() {
+    this._log(`Starting geth long-running process...`);
+
     let gethcli = this._buildGethCommandLine();
 
-    this._proc = this._exec(getcli, {
+    this._proc = this._exec(gethcli, {
       async: true,
     });
 
     this._proc.on('error', (err) => {
-      console.error('Child unexpectedly errored', err.toString());
+      this._logError('Child unexpectedly errored', err.toString());
     });
   }
 
@@ -193,12 +236,37 @@ class Geth {
 
 
   _exec (cli, options) {
+    this._log(`Executing command: ${cli}`);
+
     options = Object.assign({
       silent: !this._verbose,
       async: false,
     }, options);
 
-    return shell.exec(cli, options);
+    let ret = shell.exec(cli, options);
+
+    // if async not true then check return code
+    if (!options.async) {
+      if (0 !== ret.code) {
+        throw new Error('Execution failed: ' + ret.stderr);
+      }
+    }
+
+    return ret;
+  }
+
+
+  _log () {
+    if (this._verbose) {
+      console.log.apply(console, arguments);
+    }
+  }
+
+
+  _logError () {
+    if (this._verbose) {
+      console.error.apply(console, arguments);
+    }
   }
 }
 
