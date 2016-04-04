@@ -53,7 +53,7 @@ Run the `attach` command given to attach a console to this running geth
 instance. By default [web3](https://github.com/ethereum/web3.js) RPC is also 
 enabled.
 
-One it's running launch Ethereum/Mist wallet as normal - it should be able to 
+Once it's running launch the Ethereum/Mist wallet as normal - it should be able to 
 connect to your geth instance. 
 
 
@@ -112,7 +112,7 @@ inst.start()
 
 ```
 
-Same as for the CLI, you can customize it by passing options to the construction:
+Same as for the CLI, you can customize it by passing options during construction:
 
 ```js
 var geth = require('geth-private');
