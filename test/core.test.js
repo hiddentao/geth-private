@@ -52,6 +52,7 @@ test['default'] = {
     },
     'is running': function() {
       this.inst.isRunning.should.be.true;
+      expect(this.inst.pid > 0).to.be.true;
     },
     'account': function() {
       (this.inst.account || '').length.should.eql(40);

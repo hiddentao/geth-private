@@ -1,2 +1,57 @@
 #!/usr/bin/env node
 
+"use strict";
+
+
+const yargs = require('yargs');
+
+const geth = require('..');
+
+const packageJson = require('../package.json');
+
+
+// CLI options
+const argv = yargs
+    .usage('Usage: $0 [options]')
+    .describe('gethPath', 'Path to geth executable to use instead of default')
+    .help('h')
+    .alias('h', 'help')
+    .boolean('v', 'Verbose logging')
+    .describe('version', 'Output version.')
+    .epilogue('All other options get passed onto the geth executable.')
+    .parse(process.argv.slice(1));
+
+if (argv.version) {
+  return console.log(`geth-private ${packageJson.version}`);
+}
+
+var gethOptions = {};
+
+var nonGethOptionKeys = [
+  '_', '$0', 'v', 'h', 'help', 'version', 'gethPath'
+]
+
+for (let key in argv) {
+  if (0 > nonGethOptionKeys.indexOf(key)) {
+    gethOptions[key] = argv[key];
+  }
+}
+
+
+var inst = geth({
+  verbose: !!argv.v,
+  gethPath: argv.gethPath || null,
+  gethOptions: gethOptions
+})
+
+inst.start()
+  .then(function() {
+    console.log(`Geth is now running (pid: ${inst.pid}).\n`);
+    console.log(`Etherbase:\t${inst.account}`);
+    console.log(`Data folder:\t${inst.dataDir}`);
+    console.log(`\nTo access:\tgeth attach ipc://${inst.dataDir}/geth.ipc`);
+  })
+  .catch(function(err) {
+    console.error(err);
+  });
+

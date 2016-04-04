@@ -56,6 +56,10 @@ class Geth {
     return !!this._proc;
   }
 
+  get pid () {
+    return this._proc.pid;
+  }
+
 
   stop() {
     return Q.try(() => {
