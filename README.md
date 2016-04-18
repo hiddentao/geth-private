@@ -7,6 +7,7 @@ Features:
 * Programmatic as well as command-line interface
 * Automatically enables IPC and RPC/CORS access
 * Override all options passed to the `geth` executable.
+* Execute console commands against the running geth instance.
 * Works with [Mist wallet](https://github.com/ethereum/mist)
 
 _Thanks to [Ade Duke](http://adeduke.com/2015/08/how-to-create-a-private-ethereum-chain/) for original how-to._
