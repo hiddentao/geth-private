@@ -162,6 +162,46 @@ inst.start()
   ...
 ```
 
+### Mining
+
+To start and stop mining:
+
+```js
+var inst = geth();
+
+inst.start()
+  .then(() => {
+    return inst.consoleExec('miner.start()');
+  })
+  ...
+  .then(() => {
+    return inst.consoleExec('miner.stop()');
+  })
+  ...
+```
+
+If your machine is mining too quickly and producing multiple blocks with the 
+same number then you may want to increase the mining `difficulty` in the genesis 
+block:
+
+```js
+var inst = geth({
+  genesisBlock: {
+    difficulty: '0x10000000'  /* super hard difficulty! */    
+  }
+});
+
+inst.start();
+...
+```
+
+You can also do this via the CLI:
+
+```bash
+$ geth-private --genesisBlock '{"difficulty":"0x10000000"}'
+```
+
+
 
 ## Development
 
