@@ -96,6 +96,25 @@ class Geth {
     });
   }
 
+  /**
+   * Execute a command in the JS console of the running geth instance.
+   * @param  {String} jsCommand
+   * @return {Promise}
+   */
+  consoleExec (jsCommand) {
+    return Q.try(() => {
+      if (!this._proc) {
+        throw new Error("Not started");
+      }
+
+      return this._exec(
+        this._buildGethCommandLine(
+          ['--exec', jsCommand, 'attach', `ipc://${this.dataDir}/geth.ipc`]
+        )
+      ).stdout;
+    });
+  }
+
 
   get account () {
     return this._account;

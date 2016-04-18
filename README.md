@@ -136,6 +136,22 @@ var inst = geth({
 inst.start().then(...);
 ```
 
+You can execute web3 commands against the running geth instance:
+
+```js
+var inst = geth();
+
+inst.start()
+  .then(() => {
+    return inst.consoleExec('web3.version.api');
+  })
+  .then((version) => {
+    console.log(version);
+  })
+  ...
+```
+
+
 ## Development
 
 To run the tests:
