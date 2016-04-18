@@ -29,7 +29,7 @@ if (argv.version) {
 var gethOptions = {};
 
 var nonGethOptionKeys = [
-  '_', '$0', 'v', 'h', 'help', 'version', 'gethPath'
+  '_', '$0', 'v', 'h', 'help', 'version', 'gethPath', 'genesisBlock'
 ]
 
 for (let key in argv) {
