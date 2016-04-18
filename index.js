@@ -109,7 +109,7 @@ class Geth {
 
       return this._exec(
         this._buildGethCommandLine(
-          ['--exec', jsCommand, 'attach', `ipc://${this.dataDir}/geth.ipc`]
+          ['--exec', `"${jsCommand}"`, 'attach', `ipc://${this.dataDir}/geth.ipc`]
         )
       ).stdout;
     });
