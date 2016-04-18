@@ -188,7 +188,7 @@ block:
 ```js
 var inst = geth({
   genesisBlock: {
-    difficulty: '0x10000000'  /* super hard difficulty! */    
+    difficulty: '0x10000000000'
   }
 });
 
