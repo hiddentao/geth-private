@@ -7,6 +7,7 @@ Features:
 * Programmatic as well as command-line interface
 * Automatically enables IPC and RPC/CORS access
 * Override all options passed to the `geth` executable.
+* Override genesis block attributes including mining difficulty.
 * Execute console commands against the running geth instance.
 * Works with [Mist wallet](https://github.com/ethereum/mist)
 
