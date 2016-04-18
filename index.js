@@ -25,6 +25,9 @@ class Geth {
     // path to geth
     this._geth = options.gethPath;
 
+    // genesis options
+    this._genesisOptions = options.genesisBlock || null;
+
     if (!this._geth) {
       try {
         this._geth = which.sync('geth');
@@ -211,11 +214,11 @@ class Geth {
       "parentHash": "0x0000000000000000000000000000000000000000000000000000000000000000",
       "extraData": "0x0",
       "gasLimit": "0x8000000",
-      "difficulty": "0x400",
+      "difficulty": "0x100000",
       "mixhash": "0x0000000000000000000000000000000000000000000000000000000000000000",
       "coinbase": "0x3333333333333333333333333333333333333333",
       "alloc": {}
-    }, attrs), null, 2);
+    }, this._genesisOptions, attrs), null, 2);
   }
 
 

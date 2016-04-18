@@ -14,6 +14,7 @@ const packageJson = require('../package.json');
 const argv = yargs
     .usage('Usage: $0 [options]')
     .describe('gethPath', 'Path to geth executable to use instead of default')
+    .describe('genesisBlock', 'Genesis block overrides as a JSON string')
     .help('h')
     .alias('h', 'help')
     .boolean('v', 'Verbose logging')
@@ -41,6 +42,7 @@ for (let key in argv) {
 var inst = geth({
   verbose: !!argv.v,
   gethPath: argv.gethPath || null,
+  genesisBlock: JSON.parse(argv.genesisBlock || 'null'),
   gethOptions: gethOptions
 })
 

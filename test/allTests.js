@@ -6,6 +6,7 @@ var test = module.exports = {};
   'gethOptions', 
   'gethPath', 
   'customDataDir',
+  'genesisOptions', 
   'consoleExec', 
 ].forEach(function(name) {
   test[name] = require(`./${name}.test`);

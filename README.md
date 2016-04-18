@@ -65,6 +65,7 @@ Usage: geth-private [options]
 
 Options:
   --gethPath  Path to geth executable to use instead of default
+  --genesisBlock  Genesis block overrides as a JSON string
   -h, --help  Show help                                                [boolean]
   --version   Output version.
 
@@ -87,7 +88,7 @@ $ geth-private --datadir /path/to/data/folder
 ```
 
 When geth-private exits it won't auto-delete this data folder since you 
-manually specified its. This allows you to re-use once created keys and 
+manually specified it. This allows you to re-use once created keys and 
 accounts easily.
 
 
@@ -131,6 +132,15 @@ var inst = geth({
       rpc: false,
       identity: 'testnetwork123'
     */
+  },
+  genesisBlock: {
+    /* 
+      Attribute overrides for the genesis block
+
+      e.g.
+
+      difficulty: '0x400'
+    */    
   }
 });
 
