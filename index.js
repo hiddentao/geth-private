@@ -1,6 +1,7 @@
 "use strict";
 
 var path = require('path'),
+  chalk = require('chalk'),
   Q = require('bluebird'),
   tmp = require('tmp'),
   fs = require('fs'),
@@ -38,6 +39,9 @@ class Geth {
 
     // verbose logging
     this._verbose = !!options.verbose;
+
+    // auto-mine until balance
+    this._initialBalance = parseFloat(options.balance || 0);
   }
 
   start() {
@@ -49,19 +53,11 @@ class Geth {
 
     return Q.try(() => {
       this._createDataDir();
-      this._createGenesisFile();
+      this._setupAccountInfo();
       this._startGeth();
     });
   }
 
-
-  get isRunning () {
-    return !!this._proc;
-  }
-
-  get pid () {
-    return this._proc.pid;
-  }
 
 
   stop(options) {
@@ -110,6 +106,8 @@ class Geth {
         throw new Error("Not started");
       }
 
+      this._log(`Execute in console: ${jsCommand}`);
+
       return this._exec(
         this._buildGethCommandLine(
           ['--exec', `"${jsCommand}"`, 'attach', `ipc://${this.dataDir}/geth.ipc`]
@@ -125,6 +123,14 @@ class Geth {
 
   get dataDir () {
     return this._gethOptions.datadir;
+  }
+
+  get isRunning () {
+    return !!this._proc;
+  }
+
+  get pid () {
+    return this._proc.pid;
   }
 
   _createDataDir () {
@@ -148,7 +154,7 @@ class Geth {
   }
 
 
-  _createGenesisFile () {
+  _setupAccountInfo () {
     this._genesisFilePath = path.join(this._gethOptions.datadir, 'genesis.json');
 
     this._log(`Genesis file: ${this._genesisFilePath}`);
@@ -159,6 +165,14 @@ class Geth {
       // create genesis file
       let genesisStr = this._buildGenesisString();
       fs.writeFileSync(this._genesisFilePath, genesisStr);
+
+      // initialize the chain
+      this._log(`Creating genesis chain data...`);
+      this._exec(
+        this._buildGethCommandLine(
+          ['init', this._genesisFilePath]
+        )
+      );
       
       // start geth and create an account
       this._log(`Creating account...`);
@@ -171,14 +185,6 @@ class Geth {
       // load account info
       this._loadAccountInfo();
 
-      // overwrite new genesis file with account and preset balance
-      this._log(`Re-writing genesis file with presets...`);
-      let alloc = {};
-      alloc[this._account] = {
-        "balance": "5000000000000000000000000"
-      };
-      let newGenesisStr = this._buildGenesisString({ alloc: alloc });
-      fs.writeFileSync(this._genesisFilePath, newGenesisStr);
     } else {
       this._loadAccountInfo();
     }
@@ -231,9 +237,58 @@ class Geth {
       async: true,
     });
 
+    if (this._initialBalance) {
+      this._log(`Auto-mining until balance of ${this._initialBalance} ether is achieved...`);
+      
+      this._doInitialBalanceMiningLoop();
+    }
+
     this._proc.on('error', (err) => {
       this._logError('Child unexpectedly errored', err.toString());
     });
+  }
+
+
+  _doInitialBalanceMiningLoop () {
+    setTimeout(() => {
+      if (!this._proc) {
+        return;
+      }
+
+      Q.all([
+        this.consoleExec(`web3.fromWei(eth.getBalance('0x${this._account}'), 'ether')`),
+        this.consoleExec(`eth.mining`),
+      ])
+        .spread((balance, isMining) => {
+          balance = parseFloat(balance.trim());
+          isMining = ('true' === isMining.trim());
+
+          if (balance < this._initialBalance) {
+            return Q.try(() => {
+              this._log(`Account balance (${balance}) is < limit (${this._initialBalance}).`);
+
+              if (!isMining) {
+                this._log(`Start mining...`);              
+
+                return this.consoleExec('miner.start()');
+              }              
+            })
+              .then(() => this._doInitialBalanceMiningLoop());
+
+          } else {
+            this._log(`Account balance (${balance}) is >= limit (${this._initialBalance}).`);
+
+            if (isMining) {
+              this._log(`Stop mining...`);
+
+              return this.consoleExec('miner.stop()')              
+            }
+          }
+        })
+        .catch((err) => {
+          this._logError('Error fetching account balance', err);
+        });      
+    }, 500);
   }
 
 
@@ -254,9 +309,6 @@ class Geth {
         }        
       }
     }
-
-    // genesis file
-    str.push('--genesis', this._genesisFilePath);
 
     return `${this._geth} ${str.join(' ')} ${command ? command.join(' ') : ''}`;
   }
@@ -285,14 +337,22 @@ class Geth {
 
   _log () {
     if (this._verbose) {
-      console.log.apply(console, arguments);
+      let args = Array.prototype.map.call(arguments, (a) => {
+        return chalk.cyan(a);
+      });
+
+      console.log.apply(console, args);
     }
   }
 
 
   _logError () {
     if (this._verbose) {
-      console.error.apply(console, arguments);
+      let args = Array.prototype.map(arguments, (a) => {
+        return chalk.red(a);
+      });
+
+      console.error.apply(console, args);
     }
   }
 }

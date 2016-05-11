@@ -65,7 +65,7 @@ module.exports = {
       'check balance': function() {
         let out = testUtils.gethExecJs(this.inst.dataDir, `web3.fromWei(eth.getBalance(eth.coinbase),"ether")`);
 
-        out.trim().should.eql('5000000');  // 5million, awwww yeah ;)
+        out.trim().should.eql('0');
       },  
     },
     'rpc': {

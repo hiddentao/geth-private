@@ -41,7 +41,7 @@ module.exports = {
     this.inst.start()
       .then(() => {
         let out = testUtils.gethExecJs(this.inst.dataDir, `admin.nodeInfo`);
-        out.should.contain('Geth/testnode123');
+        out.should.contain('testnode123');
         out.should.contain('listener: 44323');
       })
       .then(() => {

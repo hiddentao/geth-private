@@ -3,7 +3,8 @@
 "use strict";
 
 
-const yargs = require('yargs');
+const yargs = require('yargs'),
+  chalk = require('chalk');
 
 const geth = require('..');
 
@@ -13,6 +14,7 @@ const packageJson = require('../package.json');
 // CLI options
 const argv = yargs
     .usage('Usage: $0 [options]')
+    .describe('balance', 'Auto-mine until this initial Ether balance is achieved (default: 0)')
     .describe('gethPath', 'Path to geth executable to use instead of default')
     .describe('genesisBlock', 'Genesis block overrides as a JSON string')
     .help('h')
@@ -29,7 +31,7 @@ if (argv.version) {
 var gethOptions = {};
 
 var nonGethOptionKeys = [
-  '_', '$0', 'v', 'h', 'help', 'version', 'gethPath', 'genesisBlock'
+  '_', '$0', 'v', 'h', 'help', 'version', 'gethPath', 'genesisBlock', 'balance'
 ]
 
 for (let key in argv) {
@@ -41,6 +43,7 @@ for (let key in argv) {
 
 var inst = geth({
   verbose: !!argv.v,
+  balance: argv.balance,
   gethPath: argv.gethPath || null,
   genesisBlock: JSON.parse(argv.genesisBlock || 'null'),
   gethOptions: gethOptions
@@ -48,10 +51,10 @@ var inst = geth({
 
 inst.start()
   .then(function() {
-    console.log(`Geth is now running (pid: ${inst.pid}).\n`);
-    console.log(`Etherbase:\t${inst.account}`);
-    console.log(`Data folder:\t${inst.dataDir}`);
-    console.log(`\nTo access:\tgeth attach ipc://${inst.dataDir}/geth.ipc`);
+    console.log(chalk.yellow(`Geth is now running (pid: ${inst.pid}).\n`));
+    console.log(chalk.yellow(`Etherbase:\t${inst.account}`));
+    console.log(chalk.yellow(`Data folder:\t${inst.dataDir}`));
+    console.log(chalk.yellow(`\nTo access:\tgeth attach ipc://${inst.dataDir}/geth.ipc`));
   })
   .catch(function(err) {
     console.error(err);

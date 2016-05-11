@@ -9,6 +9,7 @@ Features:
 * Override all options passed to the `geth` executable.
 * Override genesis block attributes including mining difficulty.
 * Execute console commands against the running geth instance.
+* Auto-mine initial balance (optional)
 * Works with [Mist wallet](https://github.com/ethereum/mist)
 
 _Thanks to [Ade Duke](http://adeduke.com/2015/08/how-to-create-a-private-ethereum-chain/) for original how-to._
@@ -65,10 +66,11 @@ connect to your geth instance.
 Usage: geth-private [options]
 
 Options:
-  --gethPath  Path to geth executable to use instead of default
+  --balance       Auto-mine until this initial Ether balance is achieved (default: 0)
+  --gethPath       Path to geth executable to use instead of default
   --genesisBlock  Genesis block overrides as a JSON string
-  -h, --help  Show help                                                [boolean]
-  --version   Output version.
+  -h, --help      Show help                                                [boolean]
+  --version       Output version.
 
 All other options get passed onto the geth executable.
 ```
@@ -121,6 +123,7 @@ Same as for the CLI, you can customize it by passing options during construction
 var geth = require('geth-private');
 
 var inst = geth({
+  balance: 10,
   gethPath: '/path/to/geth',
   verbose: true,
   gethOptions: {
@@ -202,6 +205,8 @@ You can also do this via the CLI:
 $ geth-private --genesisBlock '{"difficulty":"0x10000000"}'
 ```
 
+_NOTE: the `--balance` option will make geth-private automatically mine until 
+the given Ether balance is achieved._
 
 
 ## Development
