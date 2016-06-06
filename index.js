@@ -71,7 +71,7 @@ class Geth {
       }, options);
 
       return new Q((resolve, reject) => {
-        this._proc.on('close', (code, signal) => {
+        this._proc.on('exit', (code, signal) => {
           this._log(`Stopped.`);
 
           this._proc = null;
