@@ -22,7 +22,7 @@ var source = require('../');
 
 module.exports = {
   before: function(done) {
-    this.inst = source({
+    let inst = this.inst = source({
       balance: 5,
       genesisBlock: {
         difficulty: '0x10',
@@ -30,7 +30,10 @@ module.exports = {
       },
     });
     
-    this.inst.start()
+    Q.delay(5000)
+      .then(function() {
+        return inst.start()
+      });
       .asCallback(done);
   },
   after: function(done) {

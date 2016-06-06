@@ -4,11 +4,11 @@ var test = module.exports = {};
   // 'basic', 
   // 'cleanup', 
   // 'gethOptions', 
-  'gethPath', 
+  // 'gethPath', 
   // 'customDataDir',
   // 'genesisOptions', 
   // 'consoleExec', 
-  // 'balance', 
+  'balance', 
 ].forEach(function(name) {
   test[name] = require(`./${name}.test`);
 });
