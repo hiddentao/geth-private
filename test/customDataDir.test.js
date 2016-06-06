@@ -36,7 +36,7 @@ module.exports = {
     Q.resolve()
       .then(() => {
         if (this.inst && this.inst.isRunning) {
-          return this.inst.stop();
+          return this.inst.stop({ kill: true });
         }
       })
       .then(() => {

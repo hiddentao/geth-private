@@ -36,7 +36,7 @@ module.exports = {
   after: function(done) {
     Q.resolve().then(() => {
       if (this.inst.isRunning) {
-        return this.inst.stop();
+        return this.inst.stop({ kill: true });
       }
     })
     .asCallback(done);
@@ -44,7 +44,7 @@ module.exports = {
   'check that the balance is eventually 5': function(done) {
     this.timeout(10000);
 
-    Q.delay(5000)
+    Q.delay(8000)
       .then(() => {
         return this.inst.consoleExec('web3.fromWei(eth.getBalance(eth.coinbase), \'ether\')');
       })
