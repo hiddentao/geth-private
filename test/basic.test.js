@@ -44,7 +44,6 @@ module.exports = {
           return this.inst.stop({ kill: true });
         }
       })
-      .delay(10000)
       .asCallback(done);
     },
     'is running': function() {
