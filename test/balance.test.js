@@ -24,9 +24,8 @@ module.exports = {
   before: function(done) {
     let inst = this.inst = source({
       balance: 5,
-      verbose: true,
       genesisBlock: {
-        difficulty: '0x10',
+        difficulty: '0x1',
         extraData: '0x1',
       },
     });

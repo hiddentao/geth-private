@@ -1,14 +1,14 @@
 var test = module.exports = {};
 
 [
-  // 'basic', 
+  'basic', 
   // 'cleanup', 
   // 'gethOptions', 
   // 'gethPath', 
   // 'customDataDir',
   // 'genesisOptions', 
   // 'consoleExec', 
-  'balance', 
+  // 'balance', 
 ].forEach(function(name) {
   test[name] = require(`./${name}.test`);
 });
