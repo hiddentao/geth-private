@@ -20,9 +20,7 @@ var source = require('../');
 
 module.exports = {
   before: function() {
-    this.inst = source({
-      verbose: true,
-    });
+    this.inst = source();
   },
   'not started': function() {
     this.inst.isRunning.should.be.false;

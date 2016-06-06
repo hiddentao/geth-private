@@ -30,7 +30,7 @@ module.exports = {
   after: function(done) {
     Q.resolve().then(() => {
       if (this.inst.isRunning) {
-        return this.inst.stop({ kill: true });
+        return this.inst.stop();
       }
     })
     .asCallback(done);
