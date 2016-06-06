@@ -32,8 +32,8 @@ module.exports = {
     
     Q.delay(5000)
       .then(function() {
-        return inst.start()
-      });
+        return inst.start();
+      })
       .asCallback(done);
   },
   after: function(done) {
