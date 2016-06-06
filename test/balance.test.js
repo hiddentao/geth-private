@@ -24,16 +24,14 @@ module.exports = {
   before: function(done) {
     let inst = this.inst = source({
       balance: 5,
+      verbose: true,
       genesisBlock: {
         difficulty: '0x10',
         extraData: '0x1',
       },
     });
     
-    Q.delay(5000)
-      .then(function() {
-        return inst.start();
-      })
+    inst.start()
       .asCallback(done);
   },
   after: function(done) {
