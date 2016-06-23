@@ -15,6 +15,7 @@ class Geth {
 
     // options for geth
     this._gethOptions = Object.assign({
+      dev: true,
       networkid: "33333",
       rpccorsdomain: "*",
       rpc: true,
