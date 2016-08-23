@@ -55,7 +55,7 @@ Run the `attach` command given to attach a console to this running geth
 instance. By default [web3](https://github.com/ethereum/web3.js) RPC is also 
 enabled.
 
-Once it's running launch the Ethereum/Mist wallet as normal - it should be able to 
+Once it's running launch the Ethereum/Mist wallet with the `--rpc http://localhost:8545` CLI option - it should be able to 
 connect to your geth instance. 
 
 
