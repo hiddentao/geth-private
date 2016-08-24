@@ -9,6 +9,7 @@ var test = module.exports = {};
   'genesisOptions', 
   'consoleExec', 
   'balance', 
+  'autoMine',
 ].forEach(function(name) {
   test[name] = require(`./${name}.test`);
 });

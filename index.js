@@ -15,7 +15,6 @@ class Geth {
 
     // options for geth
     this._gethOptions = Object.assign({
-      dev: true,
       networkid: "33333",
       rpccorsdomain: "*",
       rpc: true,
@@ -43,6 +42,9 @@ class Geth {
 
     // auto-mine until balance
     this._initialBalance = parseFloat(options.balance || 0);
+    
+    // auto-mine indefinitely
+    this._autoMine = !!options.autoMine;
   }
 
   start() {
@@ -238,10 +240,10 @@ class Geth {
       async: true,
     });
 
-    if (this._initialBalance) {
-      this._log(`Auto-mining until balance of ${this._initialBalance} ether is achieved...`);
+    if (this._initialBalance || this._autoMine) {
+      this._log(`Auto-start mining...`);
       
-      this._doInitialBalanceMiningLoop();
+      this._runMiningLoop();        
     }
 
     this._proc.on('error', (err) => {
@@ -250,7 +252,7 @@ class Geth {
   }
 
 
-  _doInitialBalanceMiningLoop () {
+  _runMiningLoop () {
     setTimeout(() => {
       if (!this._proc) {
         return;
@@ -260,35 +262,47 @@ class Geth {
         this.consoleExec(`web3.fromWei(eth.getBalance('0x${this._account}'), 'ether')`),
         this.consoleExec(`eth.mining`),
       ])
-        .spread((balance, isMining) => {
-          balance = parseFloat(balance.trim());
-          isMining = ('true' === isMining.trim());
-
-          if (balance < this._initialBalance) {
-            return Q.try(() => {
+      .spread((balance, isMining) => {
+        balance = parseFloat(balance.trim());
+        isMining = ('true' === isMining.trim());
+        
+        let keepGoing = true;
+        
+        return Q.try(() => {
+          if (this._autoMine) {
+            return;
+          } else if (this._initialBalance) {
+            if (balance < this._initialBalance) {
               this._log(`Account balance (${balance}) is < limit (${this._initialBalance}).`);
+            } else {
+              this._log(`Account balance (${balance}) is >= limit (${this._initialBalance}).`);
 
+              keepGoing = false;
+            }
+          }
+        })
+        .then(() => {
+          if (keepGoing) {
+            return Q.try(() => {
               if (!isMining) {
                 this._log(`Start mining...`);              
 
                 return this.consoleExec('miner.start()');
-              }              
+              }                                
             })
-              .then(() => this._doInitialBalanceMiningLoop());
-
+            .then(() => this._runMiningLoop());
           } else {
-            this._log(`Account balance (${balance}) is >= limit (${this._initialBalance}).`);
-
             if (isMining) {
               this._log(`Stop mining...`);
 
-              return this.consoleExec('miner.stop()')              
+              return this.consoleExec('miner.stop()');              
             }
           }
-        })
-        .catch((err) => {
-          this._logError('Error fetching account balance', err);
-        });      
+        });
+      })
+      .catch((err) => {
+        this._logError('Error fetching account balance', err);
+      });      
     }, 500);
   }
 

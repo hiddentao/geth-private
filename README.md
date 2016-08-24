@@ -9,7 +9,7 @@ Features:
 * Override all options passed to the `geth` executable.
 * Override genesis block attributes including mining difficulty.
 * Execute console commands against the running geth instance.
-* Auto-mine initial balance (optional)
+* Auto-mine (optional)
 * Works with [Mist wallet](https://github.com/ethereum/mist)
 
 _Thanks to [Ade Duke](http://adeduke.com/2015/08/how-to-create-a-private-ethereum-chain/) for original how-to._
@@ -66,7 +66,8 @@ Usage: geth-private [options]
 
 Options:
   --balance       Auto-mine until this initial Ether balance is achieved (default: 0)
-  --gethPath       Path to geth executable to use instead of default
+  --Auto-mine     Auto-mine indefinitely (overrides --balance option)
+  --gethPath      Path to geth executable to use instead of default
   --genesisBlock  Genesis block overrides as a JSON string
   -h, --help      Show help                                                [boolean]
   --version       Output version.

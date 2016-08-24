@@ -15,6 +15,7 @@ const packageJson = require('../package.json');
 const argv = yargs
     .usage('Usage: $0 [options]')
     .describe('balance', 'Auto-mine until this initial Ether balance is achieved (default: 0)')
+    .describe('autoMine', 'Auto-mine indefinitely (overrides --balance option)')
     .describe('gethPath', 'Path to geth executable to use instead of default')
     .describe('genesisBlock', 'Genesis block overrides as a JSON string')
     .help('h')
