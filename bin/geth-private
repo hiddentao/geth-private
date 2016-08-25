@@ -32,7 +32,7 @@ if (argv.version) {
 var gethOptions = {};
 
 var nonGethOptionKeys = [
-  '_', '$0', 'v', 'h', 'help', 'version', 'gethPath', 'genesisBlock', 'balance'
+  '_', '$0', 'v', 'h', 'help', 'version', 'gethPath', 'genesisBlock', 'balance', 'autoMine'
 ]
 
 for (let key in argv) {
@@ -45,6 +45,7 @@ for (let key in argv) {
 var inst = geth({
   verbose: !!argv.v,
   balance: argv.balance,
+  autoMine: !!argv.autoMine,
   gethPath: argv.gethPath || null,
   genesisBlock: JSON.parse(argv.genesisBlock || 'null'),
   gethOptions: gethOptions
