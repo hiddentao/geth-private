@@ -25,7 +25,7 @@ class Geth {
 
     // path to geth
     this._geth = options.gethPath;
-
+    
     // genesis options
     this._genesisOptions = options.genesisBlock || null;
 
@@ -147,6 +147,9 @@ class Geth {
     }
     // else let's check the given one
     else {
+      // resolve path (against current app folder)
+      options.datadir = path.resolve(process.cwd(), options.datadir);
+
       // if not found then try to create it
       if (!shell.test('-e', options.datadir)) {
         this._log(`Creating data dir: ${options.datadir}`);

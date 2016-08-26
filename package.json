@@ -1,6 +1,6 @@
 {
   "name": "geth-private",
-  "version": "1.4.1",
+  "version": "1.4.2",
   "description": "Quickly setup a local, private Ethereum blockchain.",
   "main": "index.js",
   "bin": "bin/geth-private",
