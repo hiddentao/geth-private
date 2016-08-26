@@ -66,7 +66,7 @@ Usage: geth-private [options]
 
 Options:
   --balance       Auto-mine until this initial Ether balance is achieved (default: 0)
-  --Auto-mine     Auto-mine indefinitely (overrides --balance option)
+  --autoMine     Auto-mine indefinitely (overrides --balance option)
   --gethPath      Path to geth executable to use instead of default
   --genesisBlock  Genesis block overrides as a JSON string
   -h, --help      Show help                                                [boolean]
