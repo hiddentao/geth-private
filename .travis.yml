@@ -11,6 +11,8 @@ before_install:
   - sudo apt-get update
   - sudo apt-get install -y geth
   - mkdir -p ~/.ethereum
+  - mkdir -p ~/.ethash
+  - geth makedag 360 ~/.ethash
 
 script:
   - "npm test"
