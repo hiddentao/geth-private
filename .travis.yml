@@ -13,7 +13,7 @@ before_install:
   - mkdir -p ~/.ethereum
 
 script:
-  - "npm run ci"
+  - "npm test"
 
 notifications:
   email:

@@ -5,8 +5,7 @@
   "main": "index.js",
   "bin": "bin/geth-private",
   "scripts": {
-    "test": "gulp test",
-    "ci": "TRAVIS_CI=true npm test"
+    "test": "gulp test"
   },
   "author": {
     "name": "Ramesh Nair",
