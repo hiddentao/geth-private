@@ -49,6 +49,8 @@ Data folder:  /var/folders/4v/br6x6mlx113235v1lz39nwfc0000gn/T/tmp-242211yXIVsOX
 To attach:  geth attach ipc:///var/folders/4v/br6x6mlx113235v1lz39nwfc0000gn/T/tmp-242211yXIVsOX5tP/
 ```
 
+*Note: geth-private runs Geth on port 60303 by default with networkid 33333*
+
 Default account password is `1234` :)
 
 Run the `attach` command given to attach a console to this running geth 

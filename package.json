@@ -5,7 +5,7 @@
   "main": "index.js",
   "bin": "bin/geth-private",
   "scripts": {
-    "test": " NODE_ENV=test gulp test"
+    "test": "gulp test"
   },
   "author": {
     "name": "Ramesh Nair",

@@ -72,10 +72,10 @@ class Geth {
       }
 
       options = Object.assign({
-        kill: false
+        kill: true
       }, options);
 
-      return new Q((resolve, reject) => {
+      return new Q((resolve) => {
         this._proc.on('exit', (code, signal) => {
           this._log(`Stopped.`);
 
