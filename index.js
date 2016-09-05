@@ -75,7 +75,8 @@ class Geth {
       }
 
       options = Object.assign({
-        kill: false
+        kill: false,
+        killDelay: 0, 
       }, options);
 
       return new Q((resolve) => {
@@ -90,12 +91,14 @@ class Geth {
             shell.rm('-rf', this._gethOptions.datadir);
           }
 
-          console.log(code, signal);
-
-          resolve({
-            code: code,
-            signal: signal,
-          });
+          // wait if needed
+          Q.delay(options.killDelay)
+            .then(() => {
+              resolve({
+                code: code,
+                signal: signal,
+              });              
+            });
         });
 
         this._log(`Stopping...`);

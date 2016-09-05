@@ -41,7 +41,7 @@ module.exports = {
     after: function(done) {
       Q.try(() => {
         if (this.inst.isRunning) {
-          return this.inst.stop();
+          return this.inst.stop({ killDelay: testUtils.KILL_DELAY });
         }
       })
       .asCallback(done);

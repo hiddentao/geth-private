@@ -32,13 +32,13 @@ module.exports = {
     Q.resolve()
       .then(() => {
         if (this.inst && this.inst.isRunning) {
-          return this.inst.stop();
+          return this.inst.stop({ killDelay: testUtils.KILL_DELAY });
         }
       })
       .asCallback(done);
   },
   'can stop geth': function(done) {    
-    this.inst.stop()
+    this.inst.stop({ killDelay: testUtils.KILL_DELAY })
       .then((ret) => {
         expect(ret.signal).to.eql('SIGTERM');
 
@@ -48,7 +48,8 @@ module.exports = {
   },
   'can stop using kill': function(done) {
     this.inst.stop({
-      kill: true
+      kill: true,
+      killDelay: testUtils.KILL_DELAY,
     })
       .then((ret) => {
         expect(ret.signal).to.eql('SIGKILL');
@@ -58,7 +59,7 @@ module.exports = {
       .asCallback(done);
   },
   'auto-deetes data folder': function(done) {
-    this.inst.stop()
+    this.inst.stop({ killDelay: testUtils.KILL_DELAY })
       .then(() => {
         shell.test('-e', path.join(this.inst.dataDir, 'genesis.json')).should.be.false;
       })

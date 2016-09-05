@@ -24,7 +24,7 @@ module.exports = {
     Q.resolve()
       .then(() => {
         if (this.inst && this.inst.isRunning) {
-          return this.inst.stop();
+          return this.inst.stop({ killDelay: testUtils.KILL_DELAY });
         }
       })
       .asCallback(done);
