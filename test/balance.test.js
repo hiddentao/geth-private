@@ -48,6 +48,7 @@ module.exports = {
         return this.inst.consoleExec('web3.fromWei(eth.getBalance(eth.coinbase), \'ether\')');
       })
       .then((balance) => {
+        console.log(balance);
         expect(parseInt(balance) >= 5).to.be.true;
       })
       .asCallback(done);
