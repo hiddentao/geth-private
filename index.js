@@ -90,6 +90,8 @@ class Geth {
             shell.rm('-rf', this._gethOptions.datadir);
           }
 
+          console.log(code, signal);
+
           resolve({
             code: code,
             signal: signal,
