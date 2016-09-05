@@ -22,7 +22,7 @@ var source = require('../');
 module.exports = {
   'bad path': function(done) {
     this.inst = source({
-      gethOptions: testUtils.gethOptions(),
+      
       gethPath: '/usr/bin/doesnotexist',
     });
 

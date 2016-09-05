@@ -31,12 +31,12 @@ module.exports = {
   },
   'override': function(done) {
     this.inst = source({
-      gethOptions: testUtils.gethOptions({
+      gethOptions: {
         rpc: false,
         identity: 'testnode123',
         port: 44323,        
         rpcport: 8545,
-      }),
+      },
     });
 
     this.inst.start()

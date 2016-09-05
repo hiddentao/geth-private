@@ -33,7 +33,7 @@ module.exports = {
   },
   'default': function(done) {
     this.inst = source({
-      gethOptions: testUtils.gethOptions(),
+      
     });
 
     this.inst.start()
@@ -61,7 +61,7 @@ module.exports = {
   },
   'override settings': function(done) {
     this.inst = source({
-      gethOptions: testUtils.gethOptions(),
+      
       genesisBlock: {
         difficulty: '0x400',
         extraData: '0x1',

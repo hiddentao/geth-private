@@ -28,7 +28,7 @@ module.exports = {
         difficulty: '0x1',
         extraData: '0x1',
       },
-      gethOptions: testUtils.gethOptions(),
+      
     });
     
     inst.start()

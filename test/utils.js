@@ -6,10 +6,6 @@ var shell = require('shelljs');
 const GETH = require('which').sync('geth');
 
 
-exports.gethOptions = function(opts) {
-  return opts;
-};
-
 
 exports.canAttach = function(dataDir) {
   let ret = shell.exec(`${GETH} --exec 'eth.coinbase' attach ipc://${dataDir}/geth.ipc`, {

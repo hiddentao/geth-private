@@ -28,9 +28,9 @@ module.exports = {
       shell.rm('-rf', this.datadir);
       
       this.inst = source({
-        gethOptions: testUtils.gethOptions({
+        gethOptions: {
           datadir: this.datadir,
-        }),
+        },
       });
     },
     afterEach: function(done) {
@@ -85,9 +85,9 @@ module.exports = {
       shell.rm('-rf', this.datadir);
       
       this.inst = source({
-        gethOptions: testUtils.gethOptions({
+        gethOptions: {
           datadir: dirName, /* relative path only */
-        }),
+        },
       });
     },
     afterEach: function(done) {

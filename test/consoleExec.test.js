@@ -23,7 +23,7 @@ var source = require('../');
 module.exports = {
   before: function(done) {
     this.inst = source({
-      gethOptions: testUtils.gethOptions(),
+      
     });
     
     this.inst.start()

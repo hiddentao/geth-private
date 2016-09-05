@@ -20,11 +20,7 @@ var source = require('../');
 
 module.exports = {
   before: function() {
-    this.gethOptions = testUtils.gethOptions();
-    
-    this.inst = source({
-      gethOptions: this.gethOptions,
-    });
+    this.inst = source();
   },
   'not started': function() {
     this.inst.isRunning.should.be.false;
@@ -75,7 +71,7 @@ module.exports = {
     'rpc': {
       before: function() {
         this.web3 = new Web3();
-        this.web3.setProvider(new this.web3.providers.HttpProvider(`http://localhost:${this.gethOptions.rpcport}`));
+        this.web3.setProvider(new this.web3.providers.HttpProvider(`http://localhost:8545`));
       },
       'get coinbase': function() {
         this.web3.eth.coinbase.should.eql(`0x${this.inst.account}`);

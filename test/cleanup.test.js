@@ -21,7 +21,7 @@ var source = require('../');
 module.exports = {
   beforeEach: function(done) {
     this.inst = source({
-      gethOptions: testUtils.gethOptions(),
+      
     });
 
     this.inst.start()
