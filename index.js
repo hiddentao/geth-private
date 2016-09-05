@@ -5,6 +5,7 @@ var path = require('path'),
   Q = require('bluebird'),
   tmp = require('tmp'),
   fs = require('fs'),
+  child_process = require('child_process'),
   shell = require('shelljs'),
   which = require('which');
 
@@ -15,7 +16,7 @@ class Geth {
 
     // options for geth
     this._gethOptions = Object.assign({
-      networkid: "33333",
+      networkid: 33333,
       port: 60303,
       rpc: true,
       rpcport: 8545,
@@ -24,9 +25,11 @@ class Geth {
       maxpeers: 0,
       nodiscover: true,
       // reduce overhead
-      minerthreads: "1",
+      minerthreads: 1,
       lightkdf: true,
       cache: 16,
+      // logging
+      // verbosity: 6,
     }, options.gethOptions);
 
     // path to geth
@@ -118,13 +121,16 @@ class Geth {
       this._log(`Execute in console: ${jsCommand}`);
 
       return this._exec(
-        this._buildGethCommandLine(
-          ['--exec', `"${jsCommand}"`, 'attach', `ipc://${this.dataDir}/geth.ipc`]
-        )
+        this._buildGethCommandLine({
+          command: ['--exec', `"${jsCommand}"`, 'attach', `ipc://${this.dataDir}/geth.ipc`]
+        })
       ).stdout;
     });
   }
 
+  get httpRpcEndpoint () {
+    return `http://localhost:${this._gethOptions.rpcport}`;
+  }
 
   get account () {
     return this._account;
@@ -181,17 +187,17 @@ class Geth {
       // initialize the chain
       this._log(`Creating genesis chain data...`);
       this._exec(
-        this._buildGethCommandLine(
-          ['init', this._genesisFilePath]
-        )
+        this._buildGethCommandLine({
+          command: ['init', this._genesisFilePath]
+        })
       );
       
       // start geth and create an account
       this._log(`Creating account...`);
       this._exec(
-        this._buildGethCommandLine(
-          ['js', path.join(__dirname, 'data', 'setup.js')]
-        )
+        this._buildGethCommandLine({
+          command: ['js', path.join(__dirname, 'data', 'setup.js')],
+        })
       );
 
       // load account info
@@ -208,9 +214,9 @@ class Geth {
 
     // fetch account info from geth
     let str = this._exec(
-      this._buildGethCommandLine(
-        ['account', 'list']
-      )
+      this._buildGethCommandLine({
+        command: ['account', 'list']
+      })
     ).stdout;
 
     // parse and get account id
@@ -243,21 +249,25 @@ class Geth {
   _startGeth() {
     this._log(`Starting geth long-running process...`);
 
-    let gethcli = this._buildGethCommandLine();
-
-    this._proc = this._exec(gethcli, {
-      async: true,
+    let gethcli = this._buildGethCommandLine({
+      quoteStrings: false,
     });
 
+    this._proc = child_process.spawn(gethcli[0], gethcli.slice(1),{
+      detached: false,
+      shell: false,
+      stdio: (this._verbose) ? ['ignore', 'inherit', 'inherit'] : 'ignore',
+    });
+
+    this._proc.on('error', (err) => {
+      this._logError('Child unexpectedly errored', err.toString());
+    });
+    
     if (this._initialBalance || this._autoMine) {
       this._log(`Auto-start mining...`);
       
       this._runMiningLoop();        
     }
-
-    this._proc.on('error', (err) => {
-      this._logError('Child unexpectedly errored', err.toString());
-    });
   }
 
 
@@ -316,7 +326,12 @@ class Geth {
   }
 
 
-  _buildGethCommandLine(command) {
+  _buildGethCommandLine(opts) {
+    opts = Object.assign({
+      command: [],
+      quoteStrings: true
+    }, opts);
+    
     let gethOptions = this._gethOptions;
 
     let str = [];
@@ -327,18 +342,22 @@ class Geth {
         str.push(`--${key}`);
 
         if (typeof val === "string") {
-          str.push(`"${val}"`);
+          str.push(opts.quoteStrings ? `"${val}"` : val);
         } else if (typeof val !== "boolean") {
           str.push(`${val}`);
         }        
       }
     }
 
-    return `${this._geth} ${str.join(' ')} ${command ? command.join(' ') : ''}`;
+    return [this._geth].concat(str, opts.command);
   }
 
 
   _exec (cli, options) {
+    if (Array.isArray(cli)) {
+      cli = cli.join(' ');
+    }
+
     this._log(`Executing command: ${cli}`);
 
     options = Object.assign({

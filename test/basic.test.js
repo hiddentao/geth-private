@@ -53,6 +53,9 @@ module.exports = {
     'account': function() {
       (this.inst.account || '').length.should.eql(40);
     },
+    'httpRpcEndpoint': function() {
+      (this.inst.httpRpcEndpoint || '').should.eql(`http://localhost:8545`);
+    },
     'data dir': function() {
       expect((this.inst.dataDir || '').length > 0).to.be.true;
     },
