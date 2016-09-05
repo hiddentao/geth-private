@@ -20,7 +20,11 @@ var source = require('../');
 
 module.exports = {
   before: function() {
-    this.inst = source();
+    this.gethOptions = testUtils.gethOptions();
+    
+    this.inst = source({
+      gethOptions: this.gethOptions,
+    });
   },
   'not started': function() {
     this.inst.isRunning.should.be.false;
@@ -41,7 +45,7 @@ module.exports = {
     after: function(done) {
       Q.try(() => {
         if (this.inst.isRunning) {
-          return this.inst.stop({ killDelay: testUtils.KILL_DELAY });
+          return this.inst.stop();
         }
       })
       .asCallback(done);
@@ -71,7 +75,7 @@ module.exports = {
     'rpc': {
       before: function() {
         this.web3 = new Web3();
-        this.web3.setProvider(new this.web3.providers.HttpProvider('http://localhost:8545'));
+        this.web3.setProvider(new this.web3.providers.HttpProvider(`http://localhost:${this.gethOptions.rpcport}`));
       },
       'get coinbase': function() {
         this.web3.eth.coinbase.should.eql(`0x${this.inst.account}`);

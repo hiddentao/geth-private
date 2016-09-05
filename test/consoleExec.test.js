@@ -22,7 +22,9 @@ var source = require('../');
 
 module.exports = {
   before: function(done) {
-    this.inst = source();
+    this.inst = source({
+      gethOptions: testUtils.gethOptions(),
+    });
     
     this.inst.start()
       .asCallback(done);
@@ -30,7 +32,7 @@ module.exports = {
   after: function(done) {
     Q.resolve().then(() => {
       if (this.inst.isRunning) {
-        return this.inst.stop({ killDelay: testUtils.KILL_DELAY });
+        return this.inst.stop();
       }
     })
     .asCallback(done);

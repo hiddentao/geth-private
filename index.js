@@ -16,9 +16,10 @@ class Geth {
     // options for geth
     this._gethOptions = Object.assign({
       networkid: "33333",
-      rpccorsdomain: "*",
       port: 60303,
       rpc: true,
+      rpcport: 8545,
+      rpccorsdomain: "*",
       rpcapi: "admin,db,eth,debug,miner,net,shh,txpool,personal,web3",
       maxpeers: 0,
       nodiscover: true,
@@ -76,7 +77,6 @@ class Geth {
 
       options = Object.assign({
         kill: false,
-        killDelay: 0, 
       }, options);
 
       return new Q((resolve) => {
@@ -91,14 +91,10 @@ class Geth {
             shell.rm('-rf', this._gethOptions.datadir);
           }
 
-          // wait if needed
-          Q.delay(options.killDelay)
-            .then(() => {
-              resolve({
-                code: code,
-                signal: signal,
-              });              
-            });
+          resolve({
+            code: code,
+            signal: signal,
+          });              
         });
 
         this._log(`Stopping...`);

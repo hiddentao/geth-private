@@ -6,7 +6,7 @@
   "bin": "bin/geth-private",
   "scripts": {
     "test": "gulp test",
-    "ci": "KILL_DELAY=5000 npm test"
+    "ci": "TRAVIS_CI=true npm test"
   },
   "author": {
     "name": "Ramesh Nair",

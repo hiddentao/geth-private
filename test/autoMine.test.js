@@ -28,6 +28,7 @@ module.exports = {
         difficulty: '0x1',
         extraData: '0x1',
       },
+      gethOptions: testUtils.gethOptions(),
     });
     
     inst.start()
@@ -36,7 +37,7 @@ module.exports = {
   after: function(done) {
     Q.resolve().then(() => {
       if (this.inst.isRunning) {
-        return this.inst.stop({ killDelay: testUtils.KILL_DELAY });
+        return this.inst.stop();
       }
     })
     .asCallback(done);

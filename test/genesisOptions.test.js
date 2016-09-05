@@ -26,13 +26,15 @@ module.exports = {
   afterEach: function(done) {
     Q.resolve().then(() => {
       if (this.inst && this.inst.isRunning) {
-        return this.inst.stop({ killDelay: testUtils.KILL_DELAY });
+        return this.inst.stop();
       }
     })
     .asCallback(done);
   },
   'default': function(done) {
-    this.inst = source();
+    this.inst = source({
+      gethOptions: testUtils.gethOptions(),
+    });
 
     this.inst.start()
       .then(() => {
@@ -59,6 +61,7 @@ module.exports = {
   },
   'override settings': function(done) {
     this.inst = source({
+      gethOptions: testUtils.gethOptions(),
       genesisBlock: {
         difficulty: '0x400',
         extraData: '0x1',

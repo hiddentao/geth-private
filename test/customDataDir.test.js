@@ -28,16 +28,16 @@ module.exports = {
       shell.rm('-rf', this.datadir);
       
       this.inst = source({
-        gethOptions:{
+        gethOptions: testUtils.gethOptions({
           datadir: this.datadir,
-        }
+        }),
       });
     },
     afterEach: function(done) {
       Q.resolve()
       .then(() => {
         if (this.inst && this.inst.isRunning) {
-          return this.inst.stop({ killDelay: testUtils.KILL_DELAY });
+          return this.inst.stop();
         }
       })
       .then(() => {
@@ -59,7 +59,7 @@ module.exports = {
       .then(() => {
         account = this.inst.account;
         
-        return this.inst.stop({ killDelay: testUtils.KILL_DELAY });
+        return this.inst.stop();
       })
       .then(() => {
         shell.test('-e', this.datadir).should.be.true;
@@ -85,16 +85,16 @@ module.exports = {
       shell.rm('-rf', this.datadir);
       
       this.inst = source({
-        gethOptions:{
+        gethOptions: testUtils.gethOptions({
           datadir: dirName, /* relative path only */
-        }
+        }),
       });
     },
     afterEach: function(done) {
       Q.resolve()
       .then(() => {
         if (this.inst && this.inst.isRunning) {
-          return this.inst.stop({ killDelay: testUtils.KILL_DELAY });
+          return this.inst.stop();
         }
       })
       .then(() => {

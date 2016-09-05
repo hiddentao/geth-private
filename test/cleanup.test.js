@@ -20,7 +20,9 @@ var source = require('../');
 
 module.exports = {
   beforeEach: function(done) {
-    this.inst = source();
+    this.inst = source({
+      gethOptions: testUtils.gethOptions(),
+    });
 
     this.inst.start()
       .then(() => {
@@ -32,13 +34,13 @@ module.exports = {
     Q.resolve()
       .then(() => {
         if (this.inst && this.inst.isRunning) {
-          return this.inst.stop({ killDelay: testUtils.KILL_DELAY });
+          return this.inst.stop();
         }
       })
       .asCallback(done);
   },
   'can stop geth': function(done) {    
-    this.inst.stop({ killDelay: testUtils.KILL_DELAY })
+    this.inst.stop()
       .then((ret) => {
         expect(ret.signal).to.eql('SIGTERM');
 
@@ -49,7 +51,6 @@ module.exports = {
   'can stop using kill': function(done) {
     this.inst.stop({
       kill: true,
-      killDelay: testUtils.KILL_DELAY,
     })
       .then((ret) => {
         expect(ret.signal).to.eql('SIGKILL');
@@ -59,7 +60,7 @@ module.exports = {
       .asCallback(done);
   },
   'auto-deetes data folder': function(done) {
-    this.inst.stop({ killDelay: testUtils.KILL_DELAY })
+    this.inst.stop()
       .then(() => {
         shell.test('-e', path.join(this.inst.dataDir, 'genesis.json')).should.be.false;
       })
