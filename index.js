@@ -17,6 +17,8 @@ class Geth {
     this._gethOptions = Object.assign({
       networkid: "33333",
       rpccorsdomain: "*",
+      minerthreads: "1",
+      port: 60303,
       rpc: true,
       rpcapi: "admin,db,eth,debug,miner,net,shh,txpool,personal,web3",
       maxpeers: 0,
