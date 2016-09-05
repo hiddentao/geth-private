@@ -53,11 +53,9 @@ module.exports = {
       .asCallback(done);
   },
   'check that mining is auto-resumed even if stopped': function(done) {
-    this.timeout(30000);
-    
     let initialBalance = 0;
     
-    Q.delay(10000)
+    Q.delay(20000)
       .then(() => {
         return this.inst.consoleExec('miner.stop()');
       })
@@ -65,7 +63,7 @@ module.exports = {
       .then((balance) => {
         initialBalance = parseInt(balance);
       })
-      .delay(10000)
+      .delay(20000)
       .then(() => this.inst.consoleExec('web3.fromWei(eth.getBalance(eth.coinbase), \'ether\')'))
       .then((balance) => {
         balance = parseInt(balance);
