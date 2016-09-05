@@ -17,12 +17,15 @@ class Geth {
     this._gethOptions = Object.assign({
       networkid: "33333",
       rpccorsdomain: "*",
-      minerthreads: "1",
       port: 60303,
       rpc: true,
       rpcapi: "admin,db,eth,debug,miner,net,shh,txpool,personal,web3",
       maxpeers: 0,
       nodiscover: true,
+      // reduce overhead
+      minerthreads: "1",
+      lightkdf: true,
+      cache: 16,
     }, options.gethOptions);
 
     // path to geth
@@ -72,7 +75,7 @@ class Geth {
       }
 
       options = Object.assign({
-        kill: true
+        kill: false
       }, options);
 
       return new Q((resolve) => {
