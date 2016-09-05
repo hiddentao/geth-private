@@ -42,7 +42,7 @@ module.exports = {
   'can stop geth': function(done) {    
     this.inst.stop()
       .then((ret) => {
-        expect(ret.signal).to.eql('SIGTERM');
+        expect(ret.signal === 'SIGTERM' || ret.signal === null).to.be.true;
 
         testUtils.canAttach(this.inst.dataDir).should.be.false;
       })
