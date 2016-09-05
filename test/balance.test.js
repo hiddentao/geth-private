@@ -43,7 +43,7 @@ module.exports = {
     .asCallback(done);
   },
   'check that the balance is eventually 5': function(done) {
-    Q.delay(30000)
+    Q.delay(20000)
       .then(() => {
         return this.inst.consoleExec('web3.fromWei(eth.getBalance(eth.coinbase), \'ether\')');
       })

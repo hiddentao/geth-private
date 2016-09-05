@@ -43,7 +43,7 @@ module.exports = {
     .asCallback(done);
   },
   'check that the balance is > 0': function(done) {
-    Q.delay(30000)
+    Q.delay(20000)
       .then(() => {
         return this.inst.consoleExec('web3.fromWei(eth.getBalance(eth.coinbase), \'ether\')');
       })
@@ -60,7 +60,7 @@ module.exports = {
       .then((balance) => {
         initialBalance = parseInt(balance);
       })
-      .delay(30000)
+      .delay(20000)
       .then(() => this.inst.consoleExec('web3.fromWei(eth.getBalance(eth.coinbase), \'ether\')'))
       .then((balance) => {
         balance = parseInt(balance);
