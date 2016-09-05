@@ -34,7 +34,7 @@ module.exports = {
     Q.resolve()
       .then(() => {
         if (this.inst && this.inst.isRunning) {
-          return this.inst.stop(testUtils.stopOptions());
+          return this.inst.stop();
         }
       })
       .asCallback(done);
@@ -60,7 +60,7 @@ module.exports = {
       .asCallback(done);
   },
   'auto-deletes data folder': function(done) {
-    this.inst.stop(testUtils.stopOptions())
+    this.inst.stop()
       .then(() => {
         shell.test('-e', path.join(this.inst.dataDir, 'genesis.json')).should.be.false;
       })

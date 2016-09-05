@@ -31,7 +31,7 @@ module.exports = {
     expect(this.inst.account).to.be.undefined;
   },
   'not stoppable': function(done) {
-    this.inst.stop(testUtils.stopOptions())
+    this.inst.stop()
       .catch((err) => {
         err.toString().should.contain('Not started');
       })
@@ -45,7 +45,7 @@ module.exports = {
     after: function(done) {
       Q.try(() => {
         if (this.inst.isRunning) {
-          return this.inst.stop(testUtils.stopOptions());
+          return this.inst.stop();
         }
       })
       .asCallback(done);
