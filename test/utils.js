@@ -23,6 +23,17 @@ exports.gethOptions = function(opts) {
 };
 
 
+exports.stopOptions = function() {
+  // for Travis CI we need to kill=true
+  if (process.env.TRAVIS_CI) {
+    return {
+      kill: true
+    };
+  } else {
+    return null;
+  }
+};
+
 
 exports.canAttach = function(dataDir) {
   let ret = shell.exec(`${GETH} --exec 'eth.coinbase' attach ipc://${dataDir}/geth.ipc`, {

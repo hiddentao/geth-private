@@ -37,13 +37,13 @@ module.exports = {
   after: function(done) {
     Q.resolve().then(() => {
       if (this.inst.isRunning) {
-        return this.inst.stop();
+        return this.inst.stop(testUtils.stopOptions());
       }
     })
     .asCallback(done);
   },
   'check that the balance is > 0': function(done) {
-    Q.delay(10000)
+    Q.delay(30000)
       .then(() => {
         return this.inst.consoleExec('web3.fromWei(eth.getBalance(eth.coinbase), \'ether\')');
       })
@@ -55,15 +55,12 @@ module.exports = {
   'check that mining is auto-resumed even if stopped': function(done) {
     let initialBalance = 0;
     
-    Q.delay(20000)
-      .then(() => {
-        return this.inst.consoleExec('miner.stop()');
-      })
+    this.inst.consoleExec('miner.stop()')
       .then(() => this.inst.consoleExec('web3.fromWei(eth.getBalance(eth.coinbase), \'ether\')'))
       .then((balance) => {
         initialBalance = parseInt(balance);
       })
-      .delay(20000)
+      .delay(30000)
       .then(() => this.inst.consoleExec('web3.fromWei(eth.getBalance(eth.coinbase), \'ether\')'))
       .then((balance) => {
         balance = parseInt(balance);

@@ -26,7 +26,7 @@ module.exports = {
   afterEach: function(done) {
     Q.resolve().then(() => {
       if (this.inst && this.inst.isRunning) {
-        return this.inst.stop();
+        return this.inst.stop(testUtils.stopOptions());
       }
     })
     .asCallback(done);
