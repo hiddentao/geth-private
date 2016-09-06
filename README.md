@@ -1,6 +1,6 @@
 # geth-private
 
-[![Build Status](https://secure.travis-ci.org/hiddentao/geth-private.png?branch=master)](http://travis-ci.org/hiddentao/geth-private) [![NPM module](https://badge.fury.io/js/geth-private.png)](https://badge.fury.io/js/geth-private) [![Twitter URL](https://img.shields.io/twitter/url/http/shields.io.svg?style=social&label=Follow&maxAge=2592000)](https://twitter.com/hiddentao)
+[![Build Status](https://secure.travis-ci.org/hiddentao/geth-private.png?branch=master)](http://travis-ci.org/hiddentao/geth-private) [![NPM module](https://badge.fury.io/js/geth-private.png)](https://badge.fury.io/js/geth-private) [![Follow on Twitter](https://img.shields.io/twitter/url/http/shields.io.svg?style=social&label=Follow&maxAge=2592000)](https://twitter.com/hiddentao)
 
 Quickly setup a local, private Ethereum blockchain.
 
@@ -46,9 +46,9 @@ You should see something like:
 geth is now running (pid: 2428).
 
 Etherbase:  8864324ac84c3b6c507591dfabeffdc1ad02e09b
-Data folder:  /var/folders/4v/br6x6mlx113235v1lz39nwfc0000gn/T/tmp-242211yXIVsOX5tP
+Data folder:  /var/folders/br6x6mlx113235/T/tmp-242211yX
 
-To attach:  geth attach ipc:///var/folders/4v/br6x6mlx113235v1lz39nwfc0000gn/T/tmp-242211yXIVsOX5tP/
+To attach:  geth attach ipc:///var/folders/br6x6mlx113235/T/tmp-242211yX/geth.ipc
 ```
 
 *Note: geth-private runs Geth on port 60303 by default with networkid 33333*
