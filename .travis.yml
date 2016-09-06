@@ -3,7 +3,7 @@ dist: trusty
 
 cache:
   directories:
-  - ~/.ethash
+    - ~/.ethash
   
 language: node_js
 
