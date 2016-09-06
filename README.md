@@ -1,6 +1,6 @@
 # geth-private
 
-[![Build Status](https://secure.travis-ci.org/hiddentao/geth-private.png?branch=master)](http://travis-ci.org/hiddentao/geth-private) [![NPM module](https://badge.fury.io/js/geth-private.png)](https://badge.fury.io/js/geth-private)
+[![Build Status](https://secure.travis-ci.org/hiddentao/geth-private.png?branch=master)](http://travis-ci.org/hiddentao/geth-private) [![NPM module](https://badge.fury.io/js/geth-private.png)](https://badge.fury.io/js/geth-private) [![Twitter Follow](https://img.shields.io/twitter/follow/shields_io.svg?style=social&label=Follow&maxAge=2592000)](https://twitter.com/hiddentao)
 
 Quickly setup a local, private Ethereum blockchain.
 
