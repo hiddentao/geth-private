@@ -1,6 +1,10 @@
 sudo: required
 dist: trusty
 
+cache:
+  directories:
+  - ~/.ethash
+  
 language: node_js
 
 node_js:
