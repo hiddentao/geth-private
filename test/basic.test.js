@@ -44,7 +44,7 @@ module.exports = {
     },
     default: function(done) {
       this.inst = source({
-        verbose: true
+        // verbose: true
       });
       
       this.inst.start()

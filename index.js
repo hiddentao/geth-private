@@ -386,7 +386,7 @@ class Geth {
    */
   _exec (cli, options) {
     options = Object.assign({
-      longRunning: true,
+      longRunning: false,
     }, options);
     
     return new Q((resolve, reject) => {
@@ -418,9 +418,9 @@ class Geth {
         if (options.longRunning) {
           clearTimeout(successTimer);
 
-          err = new Error(`Startup error: ${err.message}`);
+          err = new Error(`Startup error: ${err}`);
         } else {
-          err = new Error(`Execution failed: ${err.message}`);
+          err = new Error(`Execution failed: ${err}`);
         }
         
         this._logError(err);
@@ -437,7 +437,7 @@ class Geth {
         
         this._logNode(str);
         
-        if (0 <= str.indexOf('fatal:')) {
+        if (str.match(/fatal/igm)) {
           _handleError(str);
         }
       };
@@ -449,7 +449,7 @@ class Geth {
       if (options.longRunning) {
         // after 3 seconds assume startup is successful
         successTimer = setTimeout(() => {
-          this._log('Geth successfully started');
+          this._log('Node successfully started');
           
           isRunning = true;
           
@@ -459,8 +459,14 @@ class Geth {
         }, 3000);        
       } else {
         proc.on('exit', (code, signal) => {
+          this._log('Node exited');
+          
           ret.code = code;
           ret.signal = signal;
+          
+          if ((ret.stdout + ret.stderr).match(/fatal/igm)) {
+            return _handleError('Fatal error');
+          }
           
           resolve(ret);
         });
@@ -489,8 +495,8 @@ class Geth {
 
   _logError () {
     if (this._verbose) {
-      let args = Array.prototype.map(arguments, (a) => {
-        return chalk.red(a);
+      let args = Array.prototype.map.call(arguments, (a) => {
+        return chalk.red(a + '');
       });
 
       console.error.apply(console, arguments);

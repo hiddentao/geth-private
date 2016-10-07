@@ -1,13 +1,13 @@
 var test = module.exports = {};
 
 [
-  'basic', 
+  // 'basic', 
   // 'cleanup', 
   // 'gethOptions', 
   // 'gethPath', 
   // 'customDataDir',
   // 'genesisOptions', 
-  // 'consoleExec', 
+  'consoleExec', 
   // 'balance', 
   // 'autoMine',
 ].forEach(function(name) {
