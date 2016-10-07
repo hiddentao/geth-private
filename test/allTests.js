@@ -1,15 +1,15 @@
 var test = module.exports = {};
 
 [
-  // 'basic', 
-  // 'cleanup', 
-  // 'gethOptions', 
-  // 'gethPath', 
-  // 'customDataDir',
-  // 'genesisOptions', 
+  'basic', 
+  'cleanup', 
+  'gethOptions', 
+  'gethPath', 
+  'customDataDir',
+  'genesisOptions', 
   'consoleExec', 
-  // 'balance', 
-  // 'autoMine',
+  'balance', 
+  'autoMine',
 ].forEach(function(name) {
   test[name] = require(`./${name}.test`);
 });
