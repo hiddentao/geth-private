@@ -62,7 +62,7 @@ module.exports = {
     'attach console': {
       'check coinbase': function() {
         let out = testUtils.gethExecJs(this.inst.dataDir, `eth.coinbase`);
-
+        
         out.trim().should.eql(`\"0x${this.inst.account}\"`);
       },    
       'check balance': function() {
