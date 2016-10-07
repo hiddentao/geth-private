@@ -23,7 +23,6 @@ var source = require('../');
 module.exports = {
   'bad path': function(done) {
     this.inst = source({
-      
       gethPath: '/usr/bin/doesnotexist',
     });
     

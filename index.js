@@ -126,7 +126,11 @@ class Geth {
         this._buildGethCommandLine({
           command: ['--exec', `"${jsCommand}"`, 'attach', `ipc://${this.dataDir}/geth.ipc`]
         })
-      ).then((ret) => ret.stdout);
+      ).then((ret) => {
+        console.log(ret);
+        
+        return ret.stdout;
+      });
     });
   }
 
@@ -236,7 +240,7 @@ class Geth {
           throw new Error('Unable to fetch account info');
         }
         
-        this._account = accountMatch[1];
+        this._account = `0x${accountMatch[1]}`;
         
         this._log(`Account: ${this._account}`);
       });
@@ -405,9 +409,11 @@ class Geth {
 
     return bufferedSpawn(cli[0], cli.slice(1))
       .catch((err) => {
-        this._logError(`Execution failed: ${err.status}: ${err.stdout} ${err.stderr}`);
+        err = `Execution failed: ${err.status}: ${err.stdout} ${err.stderr}`;
         
-        throw err;
+        this._logError(err);
+        
+        throw new Error(err);
       });    
   }
 
