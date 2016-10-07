@@ -33,6 +33,29 @@ module.exports = {
       })
       .asCallback(done);
   },
+  'startup error': {
+    beforeEach: function(done) {
+      this.origInst = source();
+      
+      this.origInst.start().asCallback(done);
+    },
+    afterEach: function(done) {
+      this.origInst.stop().asCallback(done);
+    },
+    default: function(done) {
+      this.inst = source();
+      
+      this.inst.start()
+        .then(() => {
+          throw new Error('unexpected');
+        })
+        .catch((err) => {
+          err = '' + err;
+          err.should.contain('address already in use');
+        })
+        .asCallback(done);      
+    },
+  },
   'once started': {
     before: function(done) {
       this.inst.start()
@@ -51,7 +74,7 @@ module.exports = {
       expect(this.inst.pid > 0).to.be.true;
     },
     'account': function() {
-      (this.inst.account || '').length.should.eql(40);
+      (this.inst.account || '').length.should.eql(42);
     },
     'httpRpcEndpoint': function() {
       (this.inst.httpRpcEndpoint || '').should.eql(`http://localhost:8545`);
@@ -63,7 +86,7 @@ module.exports = {
       'check coinbase': function() {
         let out = testUtils.gethExecJs(this.inst.dataDir, `eth.coinbase`);
         
-        out.trim().should.eql(`\"0x${this.inst.account}\"`);
+        out.trim().should.eql(`\"${this.inst.account}\"`);
       },    
       'check balance': function() {
         let out = testUtils.gethExecJs(this.inst.dataDir, `web3.fromWei(eth.getBalance(eth.coinbase),"ether")`);
@@ -77,7 +100,7 @@ module.exports = {
         this.web3.setProvider(new this.web3.providers.HttpProvider(`http://localhost:8545`));
       },
       'get coinbase': function() {
-        this.web3.eth.coinbase.should.eql(`0x${this.inst.account}`);
+        this.web3.eth.coinbase.should.eql(`${this.inst.account}`);
       },
     }
   },

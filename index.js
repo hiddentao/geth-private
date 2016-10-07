@@ -6,7 +6,6 @@ var path = require('path'),
   tmp = require('tmp'),
   fs = require('fs'),
   child_process = require('child_process'),
-  bufferedSpawn = require('buffered-spawn'),
   shell = require('shelljs'),
   which = require('which');
 
@@ -88,6 +87,7 @@ class Geth {
         this._proc.on('exit', (code, signal) => {
           this._log(`Stopped.`);
 
+          this._running = false;
           this._proc = null;
 
           if (this._tmpDataDir) {
@@ -124,11 +124,11 @@ class Geth {
 
       return this._exec(
         this._buildGethCommandLine({
-          command: ['--exec', `"${jsCommand}"`, 'attach', `ipc://${this.dataDir}/geth.ipc`]
+          command: ['--exec', `"${jsCommand}"`, 'attach', 
+            this._formatPathForCli(`ipc://${this.dataDir}/geth.ipc`)
+          ]
         })
       ).then((ret) => {
-        console.log(ret);
-        
         return ret.stdout;
       });
     });
@@ -147,7 +147,7 @@ class Geth {
   }
 
   get isRunning () {
-    return !!this._proc;
+    return !!this._running;
   }
 
   get pid () {
@@ -277,24 +277,44 @@ class Geth {
         stdio:['ignore', 'pipe', 'pipe'],
       });
       
-      this._proc.on('error', (err) => {
-        this._logError('Child unexpectedly errored', err.toString());
+      // after 3 seconds assume startup is successful
+      this._running = false;
+      const successTimer = setTimeout(() => {
+        this._log('Geth successfully started');
         
-        reject(err);
-      });
+        this._running = true;
+        
+        resolve();
+      }, 3000);
+      
+      
+      const _handleError = (err) => {
+        if (!this._running) {
+          err = new Error('Startup error: ' +  err);
+          
+          this._logError(err);
+          
+          clearTimeout(successTimer);
+          
+          return reject(err);
+        } else {
+          this._logError('Runtime error: ' + err);
+        }
+      };
       
       const _handleOutput = (buf) => {
         const str = buf.toString();
         
-        if (0 <= str.toLowerCase().indexOf('http endpoint opened')) {
-          resolve();
-        }
-        
         if (this._verbose) {
           this._logNode(str);
         }
+        
+        if (0 <= str.indexOf('fatal: error')) {
+          _handleError(str);
+        }
       };
 
+      this._proc.on('error', _handleError);
       this._proc.stdout.on('data', _handleOutput);
       this._proc.stderr.on('data', _handleOutput);
     })
@@ -315,7 +335,7 @@ class Geth {
       }
 
       Q.all([
-        this.consoleExec(`web3.fromWei(eth.getBalance('0x${this._account}'), 'ether')`),
+        this.consoleExec(`web3.fromWei(eth.getBalance('${this._account}'), 'ether')`),
         this.consoleExec(`eth.mining`),
       ])
       .spread((balance, isMining) => {
@@ -405,16 +425,26 @@ class Geth {
    * @return {Promise}
    */
   _exec (cli, options) {
-    this._log(`Executing command: ${cli.join(" ")}`);
+    if (Array.isArray(cli)) {
+      cli[0] = this._formatPathForCli(cli[0]);
+      
+      cli = cli.join(' ');
+    }
 
-    return bufferedSpawn(cli[0], cli.slice(1))
-      .catch((err) => {
-        err = `Execution failed: ${err.status}: ${err.stdout} ${err.stderr}`;
-        
-        this._logError(err);
-        
-        throw new Error(err);
-      });    
+    this._log(`Executing command: ${cli}`);
+
+    return Q.try(() => {
+      let ret = shell.exec(cli, {
+        async: false,
+        silent: !this._verbose,
+      });
+
+      if (0 !== ret.code) {
+        throw new Error(`Execution failed: ${ret.code}: ${ret.stdout} ${ret.stderr}`);
+      }
+
+      return ret;      
+    });
   }
 
 

@@ -40,8 +40,12 @@ module.exports = {
   'execute bad console command': function() {
     console.warn('Test will not work until https://github.com/ethereum/go-ethereum/issues/2470 is resolved ');
   },
-  'execute good console command': function() {
-    this.inst.consoleExec('web3.toDecimal(\'0x15\')').should.eventually.eql('21\n');
+  'execute good console command': function(done) {
+    this.inst.consoleExec('web3.toDecimal(\'0x15\')')
+      .then((val) => {
+        val.should.eql("21\n");
+      })
+      .asCallback(done);
   },
 };
 
