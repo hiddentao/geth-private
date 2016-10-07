@@ -43,7 +43,9 @@ module.exports = {
       this.origInst.stop().asCallback(done);
     },
     default: function(done) {
-      this.inst = source();
+      this.inst = source({
+        verbose: true
+      });
       
       this.inst.start()
         .then(() => {

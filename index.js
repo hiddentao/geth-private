@@ -68,6 +68,9 @@ class Geth {
     return this._createDataDir()
       .then(() => this._setupAccountInfo())
       .then(() => this._startGeth())
+      .then((ret) => {
+        this._proc = ret.proc;
+      });
     ;
   }
 
@@ -87,7 +90,6 @@ class Geth {
         this._proc.on('exit', (code, signal) => {
           this._log(`Stopped.`);
 
-          this._running = false;
           this._proc = null;
 
           if (this._tmpDataDir) {
@@ -147,7 +149,7 @@ class Geth {
   }
 
   get isRunning () {
-    return !!this._running;
+    return !!this._proc;
   }
 
   get pid () {
@@ -263,71 +265,6 @@ class Geth {
   }
 
 
-  _startGeth() {
-    return new Q((resolve, reject) => {
-      this._log(`Starting geth long-running process...`);
-      
-      let gethcli = this._buildGethCommandLine({
-        quoteStrings: false,
-      });
-      
-      this._proc = child_process.spawn(gethcli[0], gethcli.slice(1),{
-        detached: false,
-        shell: false,
-        stdio:['ignore', 'pipe', 'pipe'],
-      });
-      
-      // after 3 seconds assume startup is successful
-      this._running = false;
-      const successTimer = setTimeout(() => {
-        this._log('Geth successfully started');
-        
-        this._running = true;
-        
-        resolve();
-      }, 3000);
-      
-      
-      const _handleError = (err) => {
-        if (!this._running) {
-          err = new Error('Startup error: ' +  err);
-          
-          this._logError(err);
-          
-          clearTimeout(successTimer);
-          
-          return reject(err);
-        } else {
-          this._logError('Runtime error: ' + err);
-        }
-      };
-      
-      const _handleOutput = (buf) => {
-        const str = buf.toString();
-        
-        if (this._verbose) {
-          this._logNode(str);
-        }
-        
-        if (0 <= str.indexOf('fatal: error')) {
-          _handleError(str);
-        }
-      };
-
-      this._proc.on('error', _handleError);
-      this._proc.stdout.on('data', _handleOutput);
-      this._proc.stderr.on('data', _handleOutput);
-    })
-      .then(() => {
-        if (this._initialBalance || this._autoMine) {
-          this._log(`Auto-start mining...`);
-          
-          this._runMiningLoop();        
-        }
-      });
-  }
-
-
   _runMiningLoop () {
     setTimeout(() => {
       if (!this._proc) {
@@ -424,26 +361,110 @@ class Geth {
   /**
    * @return {Promise}
    */
+  _startGeth() {
+    const gethcli = this._buildGethCommandLine({
+      quoteStrings: false,
+    });
+    
+    return this._exec(gethcli, {
+      longRunning: true
+    })
+      .then((ret) => {
+        if (this._initialBalance || this._autoMine) {
+          this._log(`Auto-start mining...`);
+          
+          this._runMiningLoop();        
+        }
+        
+        return ret;
+      });
+  }
+
+
+  /**
+   * @return {Promise}
+   */
   _exec (cli, options) {
-    if (Array.isArray(cli)) {
-      cli[0] = this._formatPathForCli(cli[0]);
+    options = Object.assign({
+      longRunning: true,
+    }, options);
+    
+    return new Q((resolve, reject) => {
+      if (options.longRunning) {
+        this._log(`Starting geth process: ${cli.join(' ')}`);
+      } else {
+        this._log(`Executing geth command:  ${cli.join(' ')}`);
+      }
       
-      cli = cli.join(' ');
-    }
-
-    this._log(`Executing command: ${cli}`);
-
-    return Q.try(() => {
-      let ret = shell.exec(cli, {
-        async: false,
-        silent: !this._verbose,
+      let isRunning = false,
+        successTimer = null;
+      
+      const proc = child_process.spawn(cli[0], cli.slice(1),{
+        detached: false,
+        shell: false,
+        stdio:['ignore', 'pipe', 'pipe'],
       });
 
-      if (0 !== ret.code) {
-        throw new Error(`Execution failed: ${ret.code}: ${ret.stdout} ${ret.stderr}`);
-      }
+      const ret = {
+        stdout: '',
+        stderr: '',
+      };
+            
+      const _handleError = (err) => {
+        if (options.longRunning && isRunning) {
+          return;
+        }
+        
+        if (options.longRunning) {
+          clearTimeout(successTimer);
 
-      return ret;      
+          err = new Error(`Startup error: ${err.message}`);
+        } else {
+          err = new Error(`Execution failed: ${err.message}`);
+        }
+        
+        this._logError(err);
+        
+        Object.assign(err, ret);
+        
+        return reject(err);
+      };
+      
+      const _handleOutput = (stream) => (buf) => {
+        const str = buf.toString();
+        
+        ret[stream] += str;
+        
+        this._logNode(str);
+        
+        if (0 <= str.indexOf('fatal:')) {
+          _handleError(str);
+        }
+      };
+
+      proc.on('error', _handleError);
+      proc.stdout.on('data', _handleOutput('stdout'));
+      proc.stderr.on('data', _handleOutput('stderr'));
+      
+      if (options.longRunning) {
+        // after 3 seconds assume startup is successful
+        successTimer = setTimeout(() => {
+          this._log('Geth successfully started');
+          
+          isRunning = true;
+          
+          ret.proc = proc;
+          
+          resolve(ret);
+        }, 3000);        
+      } else {
+        proc.on('exit', (code, signal) => {
+          ret.code = code;
+          ret.signal = signal;
+          
+          resolve(ret);
+        });
+      }
     });
   }
 
