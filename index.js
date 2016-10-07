@@ -355,6 +355,11 @@ class Geth {
 
   _exec (cli, options) {
     if (Array.isArray(cli)) {
+      // if folder names have a space in them then quote 
+      if (0 <= cli[0].indexOf(' ')) {
+        cli[0] = `"${cli[0]}"`;
+      }
+
       cli = cli.join(' ');
     }
 
@@ -364,7 +369,7 @@ class Geth {
       silent: !this._verbose,
       async: false,
     }, options);
-
+    
     let ret = shell.exec(cli, options);
 
     // if async not true then check return code

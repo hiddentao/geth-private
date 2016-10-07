@@ -32,9 +32,7 @@ module.exports = {
     .asCallback(done);
   },
   'default': function(done) {
-    this.inst = source({
-      
-    });
+    this.inst = source({});
 
     this.inst.start()
       .then(() => {
