@@ -221,7 +221,7 @@ a custom logging object:
 ```js
 var inst = geth({
   verbose: true,
-  logging: {
+  logger: {
     debug: function() {...},
     info: function() {...},
     error: function() {...}
