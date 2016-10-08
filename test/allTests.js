@@ -2,6 +2,7 @@ var test = module.exports = {};
 
 [
   'basic', 
+  'logger',
   'cleanup', 
   'gethOptions', 
   'gethPath', 

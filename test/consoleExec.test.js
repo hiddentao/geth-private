@@ -43,7 +43,7 @@ module.exports = {
   'execute good console command': function(done) {
     this.inst.consoleExec('web3.toDecimal(\'0x15\')')
       .then((val) => {
-        val.should.eql("21\n");
+        val.should.eql("21");
       })
       .asCallback(done);
   },

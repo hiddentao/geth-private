@@ -48,8 +48,13 @@ class Geth {
       }
     }
 
-    // verbose logging
+    // logging
     this._verbose = !!options.verbose;
+    this._logger = options.logger || console;
+    // console.debug does not exist in node.js, so make sure we can use it
+    if (!this._logger.debug) {
+      this._logger.debug = this._logger.info.bind(this._logger);
+    }
 
     // auto-mine until balance
     this._initialBalance = parseFloat(options.balance || 0);
@@ -389,64 +394,82 @@ class Geth {
       longRunning: false,
     }, options);
     
-    return new Q((resolve, reject) => {
-      if (options.longRunning) {
-        this._log(`Starting geth process: ${cli.join(' ')}`);
-      } else {
-        this._log(`Executing geth command:  ${cli.join(' ')}`);
-      }
-      
-      let isRunning = false,
-        successTimer = null;
-      
-      const proc = child_process.spawn(cli[0], cli.slice(1),{
-        detached: false,
-        shell: false,
-        stdio:['ignore', 'pipe', 'pipe'],
-      });
+    // execute a command
+    if (!options.longRunning) {
+      return new Q((resolve, reject) => {
+        cli[0] = this._formatPathForCli(cli[0]);
+        
+        const cmdStr = cli.join(' ');
+        
+        this._log(`Executing geth command:  ${cmdStr}`);
 
-      const ret = {
-        stdout: '',
-        stderr: '',
-      };
+        child_process.exec(cmdStr, (err, stdout, stderr) => {
+          if (err) {
+            err = new Error(`Execution failed: ${err}`);
             
-      const _handleError = (err) => {
-        if (options.longRunning && isRunning) {
-          return;
-        }
+            this._logError(err);
+
+            reject(err);
+          } else {
+            resolve({
+              stdout: stdout.trim(),
+              stderr: stderr.trim(),
+            });
+          }
+        });
+      });
+    } 
+    // start a node instance
+    else {
+      return new Q((resolve, reject) => {
+        this._log(`Starting geth process: ${cli.join(' ')}`);
         
-        if (options.longRunning) {
+        let isRunning = false,
+        successTimer = null;
+        
+        const proc = child_process.spawn(cli[0], cli.slice(1),{
+          detached: false,
+          shell: false,
+          stdio:['ignore', 'pipe', 'pipe'],
+        });
+        
+        const ret = {
+          stdout: '',
+          stderr: '',
+        };
+        
+        const _handleError = (err) => {
+          if (isRunning) {
+            return;
+          }
+          
           clearTimeout(successTimer);
-
+          
           err = new Error(`Startup error: ${err}`);
-        } else {
-          err = new Error(`Execution failed: ${err}`);
-        }
+          
+          this._logError(err);
+          
+          Object.assign(err, ret);
+          
+          return reject(err);
+        };
         
-        this._logError(err);
+        const _handleOutput = (stream) => (buf) => {
+          const str = buf.toString();
+          
+          ret[stream] += str;
+          
+          this._logNode(str);
+          
+          if (str.match(/fatal/igm)) {
+            _handleError(str);
+          }
+        };
         
-        Object.assign(err, ret);
+        proc.on('error', _handleError);
+        proc.stdout.on('data', _handleOutput('stdout'));
+        proc.stderr.on('data', _handleOutput('stderr'));
         
-        return reject(err);
-      };
-      
-      const _handleOutput = (stream) => (buf) => {
-        const str = buf.toString();
-        
-        ret[stream] += str;
-        
-        this._logNode(str);
-        
-        if (str.match(/fatal/igm)) {
-          _handleError(str);
-        }
-      };
-
-      proc.on('error', _handleError);
-      proc.stdout.on('data', _handleOutput('stdout'));
-      proc.stderr.on('data', _handleOutput('stderr'));
-      
-      if (options.longRunning) {
         // after 3 seconds assume startup is successful
         successTimer = setTimeout(() => {
           this._log('Node successfully started');
@@ -457,21 +480,8 @@ class Geth {
           
           resolve(ret);
         }, 3000);        
-      } else {
-        proc.on('exit', (code, signal) => {
-          this._log('Node exited');
-          
-          ret.code = code;
-          ret.signal = signal;
-          
-          if ((ret.stdout + ret.stderr).match(/fatal/igm)) {
-            return _handleError('Fatal error');
-          }
-          
-          resolve(ret);
-        });
-      }
-    });
+      });
+    }
   }
 
 
@@ -481,14 +491,14 @@ class Geth {
         return chalk.cyan(a);
       });
 
-      console.log.apply(console, args);
+      this._logger.info.apply(this._logger, args);
     }
   }
   
   
   _logNode () {
     if (this._verbose) {
-      console.info.apply(console, arguments);
+      this._logger.debug.apply(this._logger, arguments);
     }
   }
 
@@ -499,7 +509,7 @@ class Geth {
         return chalk.red(a + '');
       });
 
-      console.error.apply(console, arguments);
+      this._logger.error.apply(this._logger, arguments);
     }
   }
   

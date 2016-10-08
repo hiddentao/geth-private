@@ -11,6 +11,7 @@ Features:
 * Override all options passed to the `geth` executable.
 * Override genesis block attributes including mining difficulty.
 * Execute console commands against the running geth instance.
+* Logging capture
 * Auto-mine (optional)
 * Works with [Mist wallet](https://github.com/ethereum/mist)
 
@@ -211,6 +212,24 @@ $ geth-private --genesisBlock '{"difficulty":"0x10000000"}'
 
 _NOTE: the `--balance` option will make geth-private automatically mine until 
 the given Ether balance is achieved._
+
+## Logging capture
+
+When using the programmatic API you can capture all output logging by passing 
+a custom logging object:
+
+```js
+var inst = geth({
+  verbose: true,
+  logging: {
+    debug: function() {...},
+    info: function() {...},
+    error: function() {...}
+  }
+});
+
+inst.start();
+```
 
 
 ## Development
