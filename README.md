@@ -15,8 +15,6 @@ Features:
 * Auto-mine (optional)
 * Works with [Mist wallet](https://github.com/ethereum/mist)
 
-_Thanks to [Ade Duke](http://adeduke.com/2015/08/how-to-create-a-private-ethereum-chain/) for original how-to._
-
 ## Requirements:
 
 * Node.js v4 or above (you can install it using [nvm](https://github.com/creationix/nvm))
@@ -80,7 +78,8 @@ Options:
 All other options get passed onto the geth executable.
 ```
 
-For example, you can customize network identity, port, etc:
+You can also pass options directly to geth. For example, you can customize 
+network identity, port, etc:
 
 ```bash
 $ geth-private --port 10023 --networkid 54234 --identity testnetwork
