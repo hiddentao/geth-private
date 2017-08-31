@@ -26,10 +26,9 @@ module.exports = {
       balance: 5,
       genesisBlock: {
         difficulty: '0x1',
-        extraData: '0x1',
       },
     });
-    
+
     inst.start()
       .asCallback(done);
   },
@@ -52,5 +51,3 @@ module.exports = {
       .asCallback(done);
   }
 };
-
-

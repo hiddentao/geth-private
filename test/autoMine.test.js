@@ -26,11 +26,10 @@ module.exports = {
       autoMine: true,
       genesisBlock: {
         difficulty: '0x1',
-        extraData: '0x1',
       },
-      
+
     });
-    
+
     inst.start()
       .asCallback(done);
   },
@@ -54,7 +53,7 @@ module.exports = {
   },
   'check that mining is auto-resumed even if stopped': function(done) {
     let initialBalance = 0;
-    
+
     this.inst.consoleExec('miner.stop()')
       .then(() => this.inst.consoleExec('web3.fromWei(eth.getBalance(eth.coinbase), \'ether\')'))
       .then((balance) => {
@@ -64,11 +63,9 @@ module.exports = {
       .then(() => this.inst.consoleExec('web3.fromWei(eth.getBalance(eth.coinbase), \'ether\')'))
       .then((balance) => {
         balance = parseInt(balance);
-        
+
         expect(balance > initialBalance).to.be.true;
       })
       .asCallback(done);
-  }  
+  }
 };
-
-

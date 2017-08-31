@@ -16,7 +16,6 @@ class Geth {
 
     // options for geth
     this._gethOptions = Object.assign({
-      dev: true,
       networkid: 33333,
       port: 60303,
       rpc: true,
@@ -52,10 +51,6 @@ class Geth {
     // logging
     this._verbose = !!options.verbose;
     this._logger = options.logger || console;
-    // console.debug does not exist in node.js, so make sure we can use it
-    if (!this._logger.debug) {
-      this._logger.debug = this._logger.info.bind(this._logger);
-    }
 
     // auto-mine until balance
     this._initialBalance = parseFloat(options.balance || 0);
@@ -263,12 +258,13 @@ class Geth {
   _buildGenesisString () {
     return JSON.stringify(Object.assign({
       "config": {
-        "chainId": 666,
+        "chainId": 1337,
         "homesteadBlock": 0,
+        "eip150Block": 0,
         "eip155Block": 0,
-        "eip158Block": 0
+        "eip158Block": 0,
       },
-      "difficulty": "0xf00",
+      "difficulty": "0xf0000",
       "gasLimit": "0x8000000",
       "alloc": {}
     }, this._genesisOptions), null, 2);
@@ -501,9 +497,9 @@ class Geth {
   }
 
 
-  _logNode () {
+  _logNode (str) {
     if (this._verbose) {
-      this._logger.debug.apply(this._logger, arguments);
+      this._logger.info(str.trim());
     }
   }
 

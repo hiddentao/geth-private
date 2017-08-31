@@ -41,28 +41,27 @@ module.exports = {
           fs.readFileSync(this.inst._genesisFilePath, 'utf-8').toString()
         );
 
-        _.pick(genesisFile, 
-          'nonce', 'timestamp', 'parentHash', 'extraData', 'gasLimit', 
-          'difficulty', 'mixhash', 'coinbase'
+        _.pick(genesisFile,
+          'config', 'gasLimit', 'difficulty', 'alloc'
         ).should.eql({
-          nonce: '0xdeadbeefdeadbeef',
-          timestamp: '0x0',
-          parentHash: '0x0000000000000000000000000000000000000000000000000000000000000000',
-          extraData: '0x0',
-          gasLimit: '0x8000000',
-          difficulty: '0xf0000',
-          mixhash: '0x0000000000000000000000000000000000000000000000000000000000000000',
-          coinbase: '0x3333333333333333333333333333333333333333'
+          "config": {
+            "chainId": 1337,
+            "homesteadBlock": 0,
+            "eip150Block": 0,
+            "eip155Block": 0,
+            "eip158Block": 0,
+          },
+          "difficulty": "0xf0000",
+          "gasLimit": "0x8000000",
+          "alloc": {}
         });
       })
       .asCallback(done);
   },
   'override settings': function(done) {
     this.inst = source({
-      
       genesisBlock: {
         difficulty: '0x400',
-        extraData: '0x1',
       }
     });
 
@@ -73,22 +72,12 @@ module.exports = {
           fs.readFileSync(this.inst._genesisFilePath, 'utf-8').toString()
         );
 
-        _.pick(genesisFile, 
-          'nonce', 'timestamp', 'parentHash', 'extraData', 'gasLimit', 
-          'difficulty', 'mixhash', 'coinbase'
+        _.pick(genesisFile,
+          'difficulty'
         ).should.eql({
-          nonce: '0xdeadbeefdeadbeef',
-          timestamp: '0x0',
-          parentHash: '0x0000000000000000000000000000000000000000000000000000000000000000',
-          extraData: '0x1',
-          gasLimit: '0x8000000',
           difficulty: '0x400',
-          mixhash: '0x0000000000000000000000000000000000000000000000000000000000000000',
-          coinbase: '0x3333333333333333333333333333333333333333'
         });
       })
       .asCallback(done);
   }
 };
-
-

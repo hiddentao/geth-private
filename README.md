@@ -22,7 +22,7 @@ Features:
 
 ## Installation
 
-I recommend installing geth-private as a global module so that the CLI becomes 
+I recommend installing geth-private as a global module so that the CLI becomes
 available in your PATH:
 
 ```bash
@@ -54,12 +54,12 @@ To attach:  geth attach ipc:///var/folders/br6x6mlx113235/T/tmp-242211yX/geth.ip
 
 Default account password is `1234` :)
 
-Run the `attach` command given to attach a console to this running geth 
-instance. By default [web3](https://github.com/ethereum/web3.js) RPC is also 
+Run the `attach` command given to attach a console to this running geth
+instance. By default [web3](https://github.com/ethereum/web3.js) RPC is also
 enabled.
 
-Once it's running launch the Ethereum/Mist wallet with the `--rpc http://localhost:8545` CLI option - it should be able to 
-connect to your geth instance. 
+Once it's running launch the Ethereum/Mist wallet with the `--rpc http://localhost:8545` CLI option - it should be able to
+connect to your geth instance.
 
 
 **Options**
@@ -72,30 +72,31 @@ Options:
   --autoMine     Auto-mine indefinitely (overrides --balance option)
   --gethPath      Path to geth executable to use instead of default
   --genesisBlock  Genesis block overrides as a JSON string
+  -v              Verbose logging
   -h, --help      Show help                                                [boolean]
   --version       Output version.
 
 All other options get passed onto the geth executable.
 ```
 
-You can also pass options directly to geth. For example, you can customize 
+You can also pass options directly to geth. For example, you can customize
 network identity, port, etc:
 
 ```bash
 $ geth-private --port 10023 --networkid 54234 --identity testnetwork
 ```
 
-By default geth-private stores its keystore and blockchain data inside a 
-temporarily generated folder, which gets automatically deleted once it exits. 
-You can override this behaviour by providing a custom location using the 
+By default geth-private stores its keystore and blockchain data inside a
+temporarily generated folder, which gets automatically deleted once it exits.
+You can override this behaviour by providing a custom location using the
 `datadir` option:
 
 ```bash
 $ geth-private --datadir /path/to/data/folder
 ```
 
-When geth-private exits it won't auto-delete this data folder since you 
-manually specified it. This allows you to re-use once created keys and 
+When geth-private exits it won't auto-delete this data folder since you
+manually specified it. This allows you to re-use once created keys and
 accounts easily.
 
 
@@ -116,7 +117,7 @@ inst.start()
     return inst.stop();
   });
   .catch(function(err) {
-    console.error(err);  
+    console.error(err);
   })
 
 ```
@@ -131,8 +132,8 @@ var inst = geth({
   gethPath: '/path/to/geth',
   verbose: true,
   gethOptions: {
-    /* 
-      These options get passed to the geth command-line 
+    /*
+      These options get passed to the geth command-line
 
       e.g.
 
@@ -142,13 +143,13 @@ var inst = geth({
     */
   },
   genesisBlock: {
-    /* 
+    /*
       Attribute overrides for the genesis block
 
       e.g.
 
       difficulty: '0x400'
-    */    
+    */
   }
 });
 
@@ -188,8 +189,11 @@ inst.start()
   ...
 ```
 
-If your machine is mining too quickly and producing multiple blocks with the 
-same number then you may want to increase the mining `difficulty` in the genesis 
+If you've never mined before then Geth will first generate a [DAG](https://github.com/ethereum/wiki/wiki/Ethash-DAG), which
+could take a while. Use the `-v` option to Geth's logging.
+
+If your machine is mining too quickly and producing multiple blocks with the
+same number then you may want to increase the mining `difficulty` in the genesis
 block:
 
 ```js
@@ -209,12 +213,13 @@ You can also do this via the CLI:
 $ geth-private --genesisBlock '{"difficulty":"0x10000000"}'
 ```
 
-_NOTE: the `--balance` option will make geth-private automatically mine until 
+_NOTE: the `--balance` option will make geth-private automatically mine until
 the given Ether balance is achieved._
+
 
 ## Logging capture
 
-When using the programmatic API you can capture all output logging by passing 
+When using the programmatic API you can capture all output logging by passing
 a custom logging object:
 
 ```js
@@ -248,4 +253,3 @@ Contributions are welcome. Please see CONTRIBUTING.md.
 ## License
 
 MIT
-
