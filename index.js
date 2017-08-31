@@ -16,6 +16,7 @@ class Geth {
 
     // options for geth
     this._gethOptions = Object.assign({
+      dev: true,
       networkid: 33333,
       port: 60303,
       rpc: true,
@@ -36,7 +37,7 @@ class Geth {
 
     // path to geth
     this._geth = options.gethPath;
-    
+
     // genesis options
     this._genesisOptions = options.genesisBlock || null;
 
@@ -58,7 +59,7 @@ class Geth {
 
     // auto-mine until balance
     this._initialBalance = parseFloat(options.balance || 0);
-    
+
     // auto-mine indefinitely
     this._autoMine = !!options.autoMine;
   }
@@ -106,7 +107,7 @@ class Geth {
           resolve({
             code: code,
             signal: signal,
-          });              
+          });
         });
 
         this._log(`Stopping...`);
@@ -131,7 +132,7 @@ class Geth {
 
       return this._exec(
         this._buildGethCommandLine({
-          command: ['--exec', `"${jsCommand}"`, 'attach', 
+          command: ['--exec', `"${jsCommand}"`, 'attach',
             this._formatPathForCli(`ipc://${this.dataDir}/geth.ipc`)
           ]
         })
@@ -153,6 +154,10 @@ class Geth {
     return this._gethOptions.datadir;
   }
 
+  get genesisFile () {
+    return this._genesisFilePath;
+  }
+
   get isRunning () {
     return !!this._proc;
   }
@@ -164,25 +169,25 @@ class Geth {
   _createDataDir () {
     return Q.try(() => {
       let options = this._gethOptions;
-      
+
       // need to create temporary data dir?
       if (!options.datadir) {
         options.datadir = this._tmpDataDir = tmp.dirSync().name;
-        
+
         this._log(`Created temporary data dir: ${options.datadir}`);
       }
       // else let's check the given one
       else {
         // resolve path (against current app folder)
         options.datadir = path.resolve(process.cwd(), options.datadir);
-        
+
         // if not found then try to create it
         if (!shell.test('-e', options.datadir)) {
           this._log(`Creating data dir: ${options.datadir}`);
-          
+
           shell.mkdir('-p', options.datadir);
-        }        
-      }        
+        }
+      }
     });
   }
 
@@ -190,19 +195,19 @@ class Geth {
   _setupAccountInfo () {
     return Q.try(() => {
       this._genesisFilePath = path.join(this._gethOptions.datadir, 'genesis.json');
-      
+
       this._log(`Genesis file: ${this._genesisFilePath}`);
-      
+
       if (!shell.test('-e', this._genesisFilePath)) {
         this._log(`Creating genesis file...`);
-        
+
         // create genesis file
         let genesisStr = this._buildGenesisString();
         fs.writeFileSync(this._genesisFilePath, genesisStr);
-        
+
         // initialize the chain
         this._log(`Creating genesis chain data...`);
-        
+
         return this._exec(
           this._buildGethCommandLine({
             command: ['init', this._formatPathForCli(this._genesisFilePath)]
@@ -211,10 +216,10 @@ class Geth {
           // start geth and create an account
           .then((ret) => {
             this._log(`Creating account...`);
-            
+
             return this._exec(
               this._buildGethCommandLine({
-                command: ['js', 
+                command: ['js',
                   this._formatPathForCli(path.join(__dirname, 'data', 'setup.js'))
                 ],
               })
@@ -232,7 +237,7 @@ class Geth {
   _loadAccountInfo () {
     return Q.try(() => {
       this._log(`Loading account info...`);
-      
+
       // fetch account info from geth
       return this._exec(
         this._buildGethCommandLine({
@@ -240,33 +245,33 @@ class Geth {
         })
       ).then((ret) => {
         let str = ret.stdout;
-        
+
         // parse and get account id
         let accountMatch = /\{(.+)\}/.exec(str);
         if (!accountMatch) {
           throw new Error('Unable to fetch account info');
         }
-        
+
         this._account = `0x${accountMatch[1]}`;
-        
+
         this._log(`Account: ${this._account}`);
       });
     });
   }
 
 
-  _buildGenesisString (attrs) {
+  _buildGenesisString () {
     return JSON.stringify(Object.assign({
-      "nonce": "0xdeadbeefdeadbeef",
-      "timestamp": "0x0",
-      "parentHash": "0x0000000000000000000000000000000000000000000000000000000000000000",
-      "extraData": "0x0",
+      "config": {
+        "chainId": 666,
+        "homesteadBlock": 0,
+        "eip155Block": 0,
+        "eip158Block": 0
+      },
+      "difficulty": "0xf00",
       "gasLimit": "0x8000000",
-      "difficulty": "0xf0000",
-      "mixhash": "0x0000000000000000000000000000000000000000000000000000000000000000",
-      "coinbase": "0x3333333333333333333333333333333333333333",
       "alloc": {}
-    }, this._genesisOptions, attrs), null, 2);
+    }, this._genesisOptions), null, 2);
   }
 
 
@@ -283,17 +288,17 @@ class Geth {
       .spread((balance, isMining) => {
         balance = parseFloat(balance.trim());
         isMining = ('true' === isMining.trim());
-        
+
         let keepGoing = true;
-        
+
         return Q.try(() => {
           if (this._autoMine) {
             return;
           } else if (this._initialBalance) {
             if (balance < this._initialBalance) {
-              this._log(`Account balance (${balance}) is < limit (${this._initialBalance}).`);
+              this._log(`Account balance (${balance}) is < target (${this._initialBalance}).`);
             } else {
-              this._log(`Account balance (${balance}) is >= limit (${this._initialBalance}).`);
+              this._log(`Account balance (${balance}) is >= target (${this._initialBalance}).`);
 
               keepGoing = false;
             }
@@ -303,24 +308,24 @@ class Geth {
           if (keepGoing) {
             return Q.try(() => {
               if (!isMining) {
-                this._log(`Start mining...`);              
+                this._log(`Start mining...`);
 
                 return this.consoleExec('miner.start()');
-              }                                
+              }
             })
             .then(() => this._runMiningLoop());
           } else {
             if (isMining) {
               this._log(`Stop mining...`);
 
-              return this.consoleExec('miner.stop()');              
+              return this.consoleExec('miner.stop()');
             }
           }
         });
       })
       .catch((err) => {
         this._logError('Error fetching account balance', err);
-      });      
+      });
     }, 500);
   }
 
@@ -330,7 +335,7 @@ class Geth {
       command: [],
       quoteStrings: true
     }, opts);
-    
+
     let gethOptions = this._gethOptions;
 
     let str = [];
@@ -349,10 +354,10 @@ class Geth {
           str.push(val);
         } else if (typeof val !== "boolean") {
           str.push(`${val}`);
-        }        
+        }
       }
     }
-    
+
     // add etherbase param
     if (this.account) {
       str.push(`--etherbase`);
@@ -370,17 +375,17 @@ class Geth {
     const gethcli = this._buildGethCommandLine({
       quoteStrings: false,
     });
-    
+
     return this._exec(gethcli, {
       longRunning: true
     })
       .then((ret) => {
         if (this._initialBalance || this._autoMine) {
           this._log(`Auto-start mining...`);
-          
-          this._runMiningLoop();        
+
+          this._runMiningLoop();
         }
-        
+
         return ret;
       });
   }
@@ -393,20 +398,20 @@ class Geth {
     options = Object.assign({
       longRunning: false,
     }, options);
-    
+
     // execute a command
     if (!options.longRunning) {
       return new Q((resolve, reject) => {
         cli[0] = this._formatPathForCli(cli[0]);
-        
+
         const cmdStr = cli.join(' ');
-        
+
         this._log(`Executing geth command:  ${cmdStr}`);
 
         child_process.exec(cmdStr, (err, stdout, stderr) => {
           if (err) {
             err = new Error(`Execution failed: ${err}`);
-            
+
             this._logError(err);
 
             reject(err);
@@ -418,68 +423,68 @@ class Geth {
           }
         });
       });
-    } 
+    }
     // start a node instance
     else {
       return new Q((resolve, reject) => {
         this._log(`Starting geth process: ${cli.join(' ')}`);
-        
+
         let isRunning = false,
         successTimer = null;
-        
+
         const proc = child_process.spawn(cli[0], cli.slice(1),{
           detached: false,
           shell: false,
           stdio:['ignore', 'pipe', 'pipe'],
         });
-        
+
         const ret = {
           stdout: '',
           stderr: '',
         };
-        
+
         const _handleError = (err) => {
           if (isRunning) {
             return;
           }
-          
+
           clearTimeout(successTimer);
-          
+
           err = new Error(`Startup error: ${err}`);
-          
+
           this._logError(err);
-          
+
           Object.assign(err, ret);
-          
+
           return reject(err);
         };
-        
+
         const _handleOutput = (stream) => (buf) => {
           const str = buf.toString();
-          
+
           ret[stream] += str;
-          
+
           this._logNode(str);
-          
+
           if (str.match(/fatal/igm)) {
             _handleError(str);
           }
         };
-        
+
         proc.on('error', _handleError);
         proc.stdout.on('data', _handleOutput('stdout'));
         proc.stderr.on('data', _handleOutput('stderr'));
-        
+
         // after 3 seconds assume startup is successful
         successTimer = setTimeout(() => {
           this._log('Node successfully started');
-          
+
           isRunning = true;
-          
+
           ret.proc = proc;
-          
+
           resolve(ret);
-        }, 3000);        
+        }, 3000);
       });
     }
   }
@@ -494,8 +499,8 @@ class Geth {
       this._logger.info.apply(this._logger, args);
     }
   }
-  
-  
+
+
   _logNode () {
     if (this._verbose) {
       this._logger.debug.apply(this._logger, arguments);
@@ -512,8 +517,8 @@ class Geth {
       this._logger.error.apply(this._logger, arguments);
     }
   }
-  
-  
+
+
   _formatPathForCli (pathStr) {
     return (0 <= pathStr.indexOf(' ')) ? `"${pathStr}"` : pathStr;
   }

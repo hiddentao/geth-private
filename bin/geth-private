@@ -54,11 +54,11 @@ var inst = geth({
 inst.start()
   .then(function() {
     console.log(chalk.yellow(`Geth is now running (pid: ${inst.pid}).\n`));
-    console.log(chalk.yellow(`Etherbase:\t${inst.account}`));
     console.log(chalk.yellow(`Data folder:\t${inst.dataDir}`));
-    console.log(chalk.yellow(`\nTo access:\tgeth attach ipc://${inst.dataDir}/geth.ipc`));
+    console.log(chalk.yellow(`Genesis file:\t${inst.genesisFile}`));
+    console.log(chalk.yellow(`\nEtherbase:\t${inst.account}`));
+    console.log(chalk.yellow(`\nIPC:\tgeth attach ipc://${inst.dataDir}/geth.ipc`));
   })
   .catch(function(err) {
     console.error(err);
   });
-
