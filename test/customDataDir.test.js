@@ -26,7 +26,7 @@ module.exports = {
       this.datadir = tmp.dirSync().name;
       // delete it straight away as we will get geth-private to create it for us
       shell.rm('-rf', this.datadir);
-      
+
       this.inst = source({
         gethOptions: {
           datadir: this.datadir,
@@ -54,24 +54,20 @@ module.exports = {
     },
     'can re-use it': function(done) {
       let account = null;
-      
+
       this.inst.start()
       .then(() => {
         account = this.inst.account;
-        
+
         return this.inst.stop();
       })
       .then(() => {
         shell.test('-e', this.datadir).should.be.true;
-        
+
         return this.inst.start();
       })
       .then(() => {
         this.inst.account.should.eql(account);
-        
-        let out = testUtils.gethExecJs(this.inst.dataDir, `web3.fromWei(eth.getBalance(eth.coinbase),"ether")`);
-        
-        out.trim().should.eql('0');
       })
       .asCallback(done);
     },
@@ -79,11 +75,11 @@ module.exports = {
   'relative paths': {
     beforeEach: function() {
       let dirName = 'test/data';
-      
+
       this.datadir = path.join(process.cwd(), dirName);
       // delete it straight away as we will get geth-private to create it for us
       shell.rm('-rf', this.datadir);
-      
+
       this.inst = source({
         gethOptions: {
           datadir: dirName, /* relative path only */
@@ -106,12 +102,10 @@ module.exports = {
       this.inst.start()
         .then(() => {
           shell.test('-e', this.datadir).should.be.true;
-          
+
           this.inst.dataDir.should.eql(this.datadir);
         })
         .asCallback(done);
     },
   },
 };
-
-

@@ -19,11 +19,12 @@ class Geth {
       networkid: 33333,
       port: 60303,
       rpc: true,
-      rpcport: 8545,
+      rpcport: 58545,
       rpccorsdomain: "*",
       rpcapi: "admin,db,eth,debug,miner,net,shh,txpool,personal,web3",
       maxpeers: 0,
       nodiscover: true,
+      dev: true,
       // reduce overhead
       minerthreads: 1,
       lightkdf: true,
@@ -51,12 +52,6 @@ class Geth {
     // logging
     this._verbose = !!options.verbose;
     this._logger = options.logger || console;
-
-    // auto-mine until balance
-    this._initialBalance = parseFloat(options.balance || 0);
-
-    // auto-mine indefinitely
-    this._autoMine = !!options.autoMine;
   }
 
   start() {
@@ -67,14 +62,14 @@ class Geth {
     this._log(`Starting...`);
 
     return this._createDataDir()
-      .then(() => this._setupAccountInfo())
       .then(() => this._startGeth())
       .then((ret) => {
         this._proc = ret.proc;
+
+        return this._loadAccountInfo();
       });
     ;
   }
-
 
 
   stop(options) {
@@ -141,24 +136,26 @@ class Geth {
     return `http://localhost:${this._gethOptions.rpcport}`;
   }
 
-  get account () {
-    return this._account;
-  }
-
   get dataDir () {
     return this._gethOptions.datadir;
-  }
-
-  get genesisFile () {
-    return this._genesisFilePath;
   }
 
   get isRunning () {
     return !!this._proc;
   }
 
+  get account () {
+    return this._account;
+  }
+
   get pid () {
     return this._proc.pid;
+  }
+
+  _loadAccountInfo () {
+    return this.consoleExec('eth.coinbase').then(account => {
+      this._account = JSON.parse(account);
+    });
   }
 
   _createDataDir () {
@@ -184,145 +181,6 @@ class Geth {
         }
       }
     });
-  }
-
-
-  _setupAccountInfo () {
-    return Q.try(() => {
-      this._genesisFilePath = path.join(this._gethOptions.datadir, 'genesis.json');
-
-      this._log(`Genesis file: ${this._genesisFilePath}`);
-
-      if (!shell.test('-e', this._genesisFilePath)) {
-        this._log(`Creating genesis file...`);
-
-        // create genesis file
-        let genesisStr = this._buildGenesisString();
-        fs.writeFileSync(this._genesisFilePath, genesisStr);
-
-        // initialize the chain
-        this._log(`Creating genesis chain data...`);
-
-        return this._exec(
-          this._buildGethCommandLine({
-            command: ['init', this._formatPathForCli(this._genesisFilePath)]
-          })
-        )
-          // start geth and create an account
-          .then((ret) => {
-            this._log(`Creating account...`);
-
-            return this._exec(
-              this._buildGethCommandLine({
-                command: ['js',
-                  this._formatPathForCli(path.join(__dirname, 'data', 'setup.js'))
-                ],
-              })
-            );
-          })
-          // load account info
-          .then(() => this._loadAccountInfo());
-      } else {
-        return this._loadAccountInfo();
-      }
-    });
-  }
-
-
-  _loadAccountInfo () {
-    return Q.try(() => {
-      this._log(`Loading account info...`);
-
-      // fetch account info from geth
-      return this._exec(
-        this._buildGethCommandLine({
-          command: ['account', 'list']
-        })
-      ).then((ret) => {
-        let str = ret.stdout;
-
-        // parse and get account id
-        let accountMatch = /\{(.+)\}/.exec(str);
-        if (!accountMatch) {
-          throw new Error('Unable to fetch account info');
-        }
-
-        this._account = `0x${accountMatch[1]}`;
-
-        this._log(`Account: ${this._account}`);
-      });
-    });
-  }
-
-
-  _buildGenesisString () {
-    return JSON.stringify(Object.assign({
-      "config": {
-        "chainId": 1337,
-        "homesteadBlock": 0,
-        "eip150Block": 0,
-        "eip155Block": 0,
-        "eip158Block": 0,
-      },
-      "difficulty": "0xf0000",
-      "gasLimit": "0x8000000",
-      "alloc": {}
-    }, this._genesisOptions), null, 2);
-  }
-
-
-  _runMiningLoop () {
-    setTimeout(() => {
-      if (!this._proc) {
-        return;
-      }
-
-      Q.all([
-        this.consoleExec(`web3.fromWei(eth.getBalance('${this._account}'), 'ether')`),
-        this.consoleExec(`eth.mining`),
-      ])
-      .spread((balance, isMining) => {
-        balance = parseFloat(balance.trim());
-        isMining = ('true' === isMining.trim());
-
-        let keepGoing = true;
-
-        return Q.try(() => {
-          if (this._autoMine) {
-            return;
-          } else if (this._initialBalance) {
-            if (balance < this._initialBalance) {
-              this._log(`Account balance (${balance}) is < target (${this._initialBalance}).`);
-            } else {
-              this._log(`Account balance (${balance}) is >= target (${this._initialBalance}).`);
-
-              keepGoing = false;
-            }
-          }
-        })
-        .then(() => {
-          if (keepGoing) {
-            return Q.try(() => {
-              if (!isMining) {
-                this._log(`Start mining...`);
-
-                return this.consoleExec('miner.start()');
-              }
-            })
-            .then(() => this._runMiningLoop());
-          } else {
-            if (isMining) {
-              this._log(`Stop mining...`);
-
-              return this.consoleExec('miner.stop()');
-            }
-          }
-        });
-      })
-      .catch((err) => {
-        this._logError('Error fetching account balance', err);
-      });
-    }, 500);
   }
 
 
@@ -354,12 +212,6 @@ class Geth {
       }
     }
 
-    // add etherbase param
-    if (this.account) {
-      str.push(`--etherbase`);
-      str.push(this.account);
-    }
-
     return [this._geth].concat(str, opts.command);
   }
 
@@ -375,15 +227,6 @@ class Geth {
     return this._exec(gethcli, {
       longRunning: true
     })
-      .then((ret) => {
-        if (this._initialBalance || this._autoMine) {
-          this._log(`Auto-start mining...`);
-
-          this._runMiningLoop();
-        }
-
-        return ret;
-      });
   }
 
 

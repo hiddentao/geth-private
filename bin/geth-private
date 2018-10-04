@@ -14,10 +14,7 @@ const packageJson = require('../package.json');
 // CLI options
 const argv = yargs
     .usage('Usage: $0 [options]')
-    .describe('balance', 'Auto-mine until this initial Ether balance is achieved (default: 0)')
-    .describe('autoMine', 'Auto-mine indefinitely (overrides --balance option)')
     .describe('gethPath', 'Path to geth executable to use instead of default')
-    .describe('genesisBlock', 'Genesis block overrides as a JSON string')
     .help('h')
     .alias('h', 'help')
     .boolean('v', 'Verbose logging')
@@ -32,7 +29,7 @@ if (argv.version) {
 var gethOptions = {};
 
 var nonGethOptionKeys = [
-  '_', '$0', 'v', 'h', 'help', 'version', 'gethPath', 'genesisBlock', 'balance', 'autoMine'
+  '_', '$0', 'v', 'h', 'help', 'version', 'gethPath'
 ]
 
 for (let key in argv) {
@@ -44,10 +41,7 @@ for (let key in argv) {
 
 var inst = geth({
   verbose: !!argv.v,
-  balance: argv.balance,
-  autoMine: !!argv.autoMine,
   gethPath: argv.gethPath || null,
-  genesisBlock: JSON.parse(argv.genesisBlock || 'null'),
   gethOptions: gethOptions
 })
 
@@ -55,8 +49,7 @@ inst.start()
   .then(function() {
     console.log(chalk.yellow(`Geth is now running (pid: ${inst.pid}).\n`));
     console.log(chalk.yellow(`Data folder:\t${inst.dataDir}`));
-    console.log(chalk.yellow(`Genesis file:\t${inst.genesisFile}`));
-    console.log(chalk.yellow(`\nEtherbase:\t${inst.account}`));
+    console.log(chalk.yellow(`\Account:\t${inst.account}`));
     console.log(chalk.yellow(`\nIPC:\tgeth attach ipc://${inst.dataDir}/geth.ipc`));
   })
   .catch(function(err) {

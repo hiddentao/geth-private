@@ -1,6 +1,6 @@
 {
   "name": "geth-private",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "description": "Quickly setup a local, private Ethereum blockchain.",
   "main": "index.js",
   "bin": "bin/geth-private",
@@ -44,7 +44,7 @@
     "chai-as-promised": "^5.3.0",
     "gulp": "^3.9.1",
     "gulp-mocha": "^2.2.0",
-    "lodash": "^4.17.4",
+    "lodash": "^4.17.11",
     "sinon": "^1.17.7",
     "web3": "^0.17.0-beta"
   }

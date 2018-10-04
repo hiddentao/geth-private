@@ -7,10 +7,7 @@ var test = module.exports = {};
   'gethOptions',
   'gethPath',
   'customDataDir',
-  'genesisOptions',
   'consoleExec',
-  'balance',
-  'autoMine',
 ].forEach(function(name) {
   test[name] = require(`./${name}.test`);
 });

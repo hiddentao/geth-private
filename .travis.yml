@@ -4,11 +4,11 @@ dist: trusty
 cache:
   directories:
     - ~/.ethash
-  
+
 language: node_js
 
 node_js:
-  - "6"
+  - "8"
 
 before_install:
   - sudo add-apt-repository -y ppa:ethereum/ethereum
@@ -24,4 +24,3 @@ script:
 notifications:
   email:
     - ram@hiddentao.com
-

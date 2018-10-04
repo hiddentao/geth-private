@@ -9,16 +9,14 @@ Features:
 * Programmatic as well as command-line interface
 * Automatically enables IPC and RPC/CORS access
 * Override all options passed to the `geth` executable.
-* Override genesis block attributes including mining difficulty.
 * Execute console commands against the running geth instance.
 * Logging capture
-* Auto-mine (optional)
 * Works with [Mist wallet](https://github.com/ethereum/mist)
 
 ## Requirements:
 
-* Node.js v4 or above (you can install it using [nvm](https://github.com/creationix/nvm))
-* [Geth](https://github.com/ethereum/go-ethereum)
+* Node.js v4 or above
+* [Geth 1.8+](https://github.com/ethereum/go-ethereum)
 
 ## Installation
 
@@ -50,15 +48,13 @@ Data folder:  /var/folders/br6x6mlx113235/T/tmp-242211yX
 To attach:  geth attach ipc:///var/folders/br6x6mlx113235/T/tmp-242211yX/geth.ipc
 ```
 
-*Note: geth-private runs Geth on port 60303 by default with networkid 33333*
-
-Default account password is `1234` :)
+*Note: geth-private runs Geth on port 60303 (and HTTP RPC on port 58545) by default with networkid 33333*
 
 Run the `attach` command given to attach a console to this running geth
 instance. By default [web3](https://github.com/ethereum/web3.js) RPC is also
-enabled.
+enabled on port 58545.
 
-Once it's running launch the Ethereum/Mist wallet with the `--rpc http://localhost:8545` CLI option - it should be able to
+Once it's running launch the Ethereum/Mist wallet with the `--rpc http://localhost:58545` CLI option - it should be able to
 connect to your geth instance.
 
 
@@ -68,8 +64,6 @@ connect to your geth instance.
 Usage: geth-private [options]
 
 Options:
-  --balance       Auto-mine until this initial Ether balance is achieved (default: 0)
-  --autoMine     Auto-mine indefinitely (overrides --balance option)
   --gethPath      Path to geth executable to use instead of default
   --genesisBlock  Genesis block overrides as a JSON string
   -v              Verbose logging
@@ -192,29 +186,6 @@ inst.start()
 If you've never mined before then Geth will first generate a [DAG](https://github.com/ethereum/wiki/wiki/Ethash-DAG), which
 could take a while. Use the `-v` option to Geth's logging.
 
-If your machine is mining too quickly and producing multiple blocks with the
-same number then you may want to increase the mining `difficulty` in the genesis
-block:
-
-```js
-var inst = geth({
-  genesisBlock: {
-    difficulty: '0x10000000000'
-  }
-});
-
-inst.start();
-...
-```
-
-You can also do this via the CLI:
-
-```bash
-$ geth-private --genesisBlock '{"difficulty":"0x10000000"}'
-```
-
-_NOTE: the `--balance` option will make geth-private automatically mine until
-the given Ether balance is achieved._
 
 
 ## Logging capture

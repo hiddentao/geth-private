@@ -34,8 +34,8 @@ module.exports = {
       gethOptions: {
         rpc: false,
         identity: 'testnode123',
-        port: 44323,        
-        rpcport: 8545,
+        port: 44323,
+        rpcport: 58545,
       },
     });
 
@@ -43,15 +43,13 @@ module.exports = {
       .then(() => {
         let out = testUtils.gethExecJs(this.inst.dataDir, `admin.nodeInfo`);
         out.should.contain('testnode123');
-        out.should.contain('listener: 44323');
       })
       .then(() => {
         var web3 = new Web3();
-        web3.setProvider(new web3.providers.HttpProvider('http://localhost:8545'));
+        web3.setProvider(new web3.providers.HttpProvider('http://localhost:58545'));
 
         web3.eth.coinbase.should.eql(this.inst.account);
       })
       .asCallback(done);
   }
 };
-

@@ -36,7 +36,7 @@ module.exports = {
   'startup error': {
     beforeEach: function(done) {
       this.origInst = source();
-      
+
       this.origInst.start().asCallback(done);
     },
     afterEach: function(done) {
@@ -46,7 +46,7 @@ module.exports = {
       this.inst = source({
         // verbose: true
       });
-      
+
       this.inst.start()
         .then(() => {
           throw new Error('unexpected');
@@ -55,7 +55,7 @@ module.exports = {
           err = '' + err;
           err.should.contain('address already in use');
         })
-        .asCallback(done);      
+        .asCallback(done);
     },
   },
   'once started': {
@@ -75,11 +75,8 @@ module.exports = {
       this.inst.isRunning.should.be.true;
       expect(this.inst.pid > 0).to.be.true;
     },
-    'account': function() {
-      (this.inst.account || '').length.should.eql(42);
-    },
     'httpRpcEndpoint': function() {
-      (this.inst.httpRpcEndpoint || '').should.eql(`http://localhost:8545`);
+      (this.inst.httpRpcEndpoint || '').should.eql(`http://localhost:58545`);
     },
     'data dir': function() {
       expect((this.inst.dataDir || '').length > 0).to.be.true;
@@ -87,25 +84,18 @@ module.exports = {
     'attach console': {
       'check coinbase': function() {
         let out = testUtils.gethExecJs(this.inst.dataDir, `eth.coinbase`);
-        
-        out.trim().should.eql(`\"${this.inst.account}\"`);
-      },    
-      'check balance': function() {
-        let out = testUtils.gethExecJs(this.inst.dataDir, `web3.fromWei(eth.getBalance(eth.coinbase),"ether")`);
 
-        out.trim().should.eql('0');
-      },  
+        JSON.parse(out).should.be.eql(this.inst.account);
+      },
     },
     'rpc': {
       before: function() {
         this.web3 = new Web3();
-        this.web3.setProvider(new this.web3.providers.HttpProvider(`http://localhost:8545`));
+        this.web3.setProvider(new this.web3.providers.HttpProvider(`http://localhost:58545`));
       },
       'get coinbase': function() {
-        this.web3.eth.coinbase.should.eql(`${this.inst.account}`);
+        this.web3.eth.coinbase.should.eql(this.inst.account);
       },
     }
   },
 };
-
-
