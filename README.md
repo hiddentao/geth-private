@@ -65,7 +65,6 @@ Usage: geth-private [options]
 
 Options:
   --gethPath      Path to geth executable to use instead of default
-  --genesisBlock  Genesis block overrides as a JSON string
   -v              Verbose logging
   -h, --help      Show help                                                [boolean]
   --version       Output version.
@@ -136,15 +135,6 @@ var inst = geth({
       identity: 'testnetwork123'
     */
   },
-  genesisBlock: {
-    /*
-      Attribute overrides for the genesis block
-
-      e.g.
-
-      difficulty: '0x400'
-    */
-  }
 });
 
 inst.start().then(...);
